@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.scripts]
-demo = "patternengine.app:main"
+patternengine-example = "patternengine.example:main"
 
 [project.urls]
 homepage = "https://github.com/dickerdackel/patternengine"
