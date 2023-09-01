@@ -38,8 +38,14 @@ class Ring:
     by the `aim` and `width`. The `aim` is the angle of the middle of the
     emitting arc, while the `width` is its angular size.
 
-    `steps` controls into how much bullet streaks the arc or circle is split
+    `steps` controls into how much emitting points the arc or circle is split
     into.  The bullets will be emitted clockwise and in infinite number.
+
+    `heartbeat` makes it possible to create bullet patterns within the ring or
+    arc, e.g. 3 bullets besides each other, followed by a gap.
+
+    Note that by making the length of `heartbeat` differ from `steps`, the
+    ring can create irregular patterns.
 
     `randomize` overrides step and just gives random positions on the arc.
 
@@ -84,6 +90,9 @@ class Ring:
     randomize: bool = False
         Ignore `steps`, just emit from random points on the ring/arc.
 
+    jitter: float = 0
+        Amount of jitter in degrees that a bullet can vary from its actual path
+
     Attributes
     ----------
     `radius`, `aim`, `width`, `randomize` parameters above are also available
@@ -102,29 +111,74 @@ class Ring:
         2nd vector same as 1st, but normalized to length of 1.
 
     """
-    def __init__(self, radius, steps, aim=0, width=360, randomize=False):
+    def __init__(self, radius, steps, aim=0, width=360,
+                 randomize=False, heartbeat='#', jitter=0):
         self.radius = radius
-        self.steps = steps
+        self._steps = steps
         self.aim = aim
-        self.width = width
+        self._width = width
         self.randomize = randomize
+        self.heartbeat = heartbeat
+        self.jitter = jitter
 
-        # if we have a full circle, don't draw both 0 and 360 degrees together
-        # if we have any other degree, include both ends of the width
-        l =  1 / steps if width == 360 else 1 / (steps - 1)
+        self.ts = self._new_t_iter()
 
-        self.ts = cycle([i * l for i in range(steps)])
+    def _new_t_iter(self):
+        step = 1 / self._steps if self._width == 360 else 1 / (self._steps - 1)
+        return cycle([i * step for i in range(self._steps)])
+
+    # Fcking not needed, but can't have setter without getter
+    @property
+    def steps(self): return self._steps  # noqa: E704
+
+    @steps.setter
+    def steps(self, steps):
+        self._steps = steps
+        self.ts = self._new_t_iter()
+
+    @property
+    def width(self): return self._width  # noqa: E704
+
+    @width.setter
+    def width(self, w):
+        if w < 0:
+            raise ValueError('Negative width not allowed')
+
+        self._width = w
+        if w != self._width and w == 360 or self._width == 360:
+            self.ts = self._new_t_iter()
+
+    @property
+    def heartbeat(self): return self._heartbeat  # noqa: E704
+
+    @heartbeat.setter
+    def heartbeat(self, h):
+        if '#' not in h: raise ValueError('Heartbeat contains no beats (#)')
+        self._heartbeat = cycle(h)
 
     def _angle(self, t):
+        """Return the angle within the aimed arc at step t"""
         # Can't precalc this, since aim or width might be changed
-        half = self.width / 2
-        return lerp(self.aim - half, self.aim + half, t)
+
+        phi = lerp(0, self._width, t) + self.aim
+        if self.jitter:
+            phi += random() * self.jitter - self.jitter / 2
+        if self._width != 360:
+            phi -= self._width / 2
+
+        return phi
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        t = random() if self.randomize else next(self.ts)
+        if self.randomize:
+            t = random()
+        else:
+            t = next(self.ts)
+            if next(self.heartbeat) != '#':
+                return None
+
         v = Vector2(1, 0)
         v.rotate_ip(self._angle(t))
 
@@ -180,7 +234,7 @@ class Heartbeat:
 
     def __next__(self):
         if self.cooldown.hot:
-            return
+            return False
 
         self.cooldown.reset(wrap=True)
         return next(self.c) == '#'
@@ -245,7 +299,10 @@ class BulletSource:
         res = []
         while next(self.heartbeat):
             for i in range(self.bullets):
-                offset, momentum = next(self.ring)
+                if not (bullet := next(self.ring)):
+                    continue
+
+                offset, momentum = bullet
                 if self.aim:
                     res.append((offset.rotate(self.aim), momentum.rotate(self.aim)))
                 else:

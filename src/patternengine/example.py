@@ -45,14 +45,16 @@ def main():
     ########################################################################
     # Relevant part here
     #
-    # A "ring" of 180 degrees aiming towards the top devided int 18 parts
-    # A heartbeat over 5 seconds with 4 emits and 4 gaps
+    # A "ring" of 180 degrees aiming towards the top devided int 30 parts,
+    #     with a pattern of allowed and empty positions.
+    # A heartbeat over 1 seconds with a comple
     # A BulletSource fetching 18 bullets at every heartbeat
     #
 
-    ring = pe.Ring(100, 18, aim=-90, width=180)
-    heartbeat = pe.Heartbeat(5, '#.#.#.#.')
-    emitter = pe.BulletSource(18, ring, heartbeat)
+    ring = pe.Ring(100, 30, aim=-90, width=180,
+                   heartbeat='##....###....##', jitter=3)
+    heartbeat = pe.Heartbeat(1, '###.#.#.')
+    emitter = pe.BulletSource(30, ring, heartbeat)
 
     #
     ########################################################################
