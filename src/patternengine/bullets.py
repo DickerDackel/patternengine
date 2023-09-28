@@ -54,7 +54,7 @@ def merge(shape, core):
     return image
 
 
-def core_factory(size, color, gradient=in_quad, debug=False, *kwargs):  # noqa: F405
+def core_factory(size, color, gradient=in_quad, *kwargs):  # noqa: F405
     r0 = int((3 / 4) * size) // 2
 
     image = pygame.Surface((size, size))
@@ -69,11 +69,10 @@ def core_factory(size, color, gradient=in_quad, debug=False, *kwargs):  # noqa: 
         color = c0.lerp(c1, t)
         pygame.draw.circle(image, color, rect.center, r)
 
-    if debug: pygame.draw.line(image, 'red', rect.center, rect.midright, width=1)
     return image
 
 
-def circle_factory(size, color, debug=False):  # noqa: F405
+def circle_factory(size, color):  # noqa: F405
     r = size // 2
     image = pygame.Surface((size, size))
     image.set_colorkey('black')
@@ -83,11 +82,10 @@ def circle_factory(size, color, debug=False):  # noqa: F405
 
     pygame.draw.circle(image, color, rect.center, r, width=stroke)
 
-    if debug: pygame.draw.line(image, 'red', rect.center, rect.midright, width=1)
     return image
 
 
-def square_factory(size, color, debug=False):
+def square_factory(size, color):
     image = pygame.Surface((size, size))
     image.set_colorkey('black')
     rect = image.get_rect()
@@ -96,11 +94,10 @@ def square_factory(size, color, debug=False):
 
     pygame.draw.rect(image, color, rect, width=stroke)
 
-    if debug: pygame.draw.line(image, 'red', rect.center, rect.midright, width=1)
     return image
 
 
-def diamond_factory(size, color, debug=False):
+def diamond_factory(size, color):
     stroke = max(1, stroke_width(size))
 
     image = pygame.Surface((2 * size, size))
@@ -113,11 +110,10 @@ def diamond_factory(size, color, debug=False):
     points = [rect.midtop, rect.midright, rect.midbottom, rect.midleft]
     pygame.draw.polygon(image, color, points, width=stroke)
 
-    if debug: pygame.draw.line(image, 'red', rect.center, rect.midright, width=1)
     return image
 
 
-def triangle_factory(size, color, debug=False):
+def triangle_factory(size, color):
     size *= 1.75
     height = size * 0.75 ** 0.5
     shift = size / 2 - (height / 3 - 1)
@@ -143,11 +139,10 @@ def triangle_factory(size, color, debug=False):
 
     image.blit(tri, r_tri)
 
-    if debug: pygame.draw.line(image, 'red', rect.center, rect.midright, width=1)
     return image
 
 
-def oval_factory(size, color, debug=False):
+def oval_factory(size, color):
     image = pygame.Surface((2 * size, size))
     image.set_colorkey('black')
     rect = image.get_rect()
@@ -155,11 +150,10 @@ def oval_factory(size, color, debug=False):
     stroke = max(1, stroke_width(size))
     pygame.draw.ellipse(image, color, rect, width=stroke)
 
-    if debug: pygame.draw.line(image, 'red', rect.center, rect.midright, width=1)
     return image
 
 
-def arrowhead_factory(size, color, debug=False):
+def arrowhead_factory(size, color):
     image = pygame.Surface((size, size))
     image.set_colorkey('black')
     rect = image.get_rect()
@@ -170,8 +164,15 @@ def arrowhead_factory(size, color, debug=False):
     stroke = max(1, stroke_width(size))
     pygame.draw.ellipse(image, color, e_rect, width=stroke)
 
-    if debug: pygame.draw.line(image, 'red', rect.center, rect.midright, width=1)
-    return image
+    # Shift center point to make the core look better
+    c_rect = rect.inflate(size // 3, 0)
+    c_rect.topleft = (0, 0)
+    canvas = pygame.Surface(c_rect.size)
+    canvas.set_colorkey('black')
+    rect.midright = c_rect.midright
+    canvas.blit(image, rect)
+
+    return canvas
 
 
 def bullet_image_factory(kind, *args, **kwargs):
