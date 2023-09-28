@@ -1,7 +1,7 @@
 [project]
 name = "patternengine"
 description = "patternengine"
-version = "0.0.3"
+version = "0.0.4"
 readme = "README.md"
 
 authors = [
@@ -19,12 +19,13 @@ classifiers = [
 dependencies = [
     "pygame-ce",
     "pgcooldown",
+    "rpeasings",
     "pyglm"
 ]
 
 [project.scripts]
-patternengine-example = "patternengine.example:main"
-demo = "patternengine.demos:main"
+pe-example = "patternengine.example:main"
+pe-demo = "patternengine.demos:main"
 
 [project.urls]
 homepage = "https://github.com/dickerdackel/patternengine"
