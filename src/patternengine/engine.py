@@ -319,6 +319,37 @@ class BulletSource:
 
 
 class Stack:
+    """Stack an emitted ring.
+
+    Pass the `Stack` instance to the `Factory` instead of the `BulletSource`.
+
+    Instead of increasing the emit frequency of a ring, to release a stack of
+    bullets, this class can be used.
+
+    It gets one emit from a bullet source and copies it a given number of
+    times.  Since all emitted bullets in a stack would have been the same
+    speed and thus be placed exactly on top of each other, a speed gain factor
+    is introduced, that scales the momentum of each level in the stack up by a
+    small amount.
+
+    This results in a stack of bullets that emit from a single point, but then
+    spread out in the direction of their momentum.  See `pe-demo 01` for an
+    example.
+
+    Parameters
+    ----------
+    bullet_source: BulletSource
+        The preconfigured bullet source, consisting of a ring and a heartbeat.
+        See above.
+    height: int
+        The height of the stack
+    gain: float
+        The factor to upscale the momentum for each level in the stack.  The
+        higher the gain, the further the emitted bullets spread out along
+        their flight path.
+
+    """
+
     def __init__(self, bullet_source, height, gain):
         self.bullet_source = bullet_source
         self.height = height
@@ -337,6 +368,31 @@ class Stack:
 
 
 class Fan:
+    """Fan out an emitted ring.
+
+    Instead of increasing the number of bullets per ring emit, bullets can be
+    fanned out over an angle.  So this is the "horizontal" counterpart to the
+    "vertical" stack.
+
+    It gets one emit from a bullet source and copies it a given number of
+    times.  The fan is centered around the initially emitted bullet.  The
+    `arc` of the fan is split um into `steps` pieces.
+
+    Note
+    ----
+    Pass the `Fan` instance to the `Factory` instead of the `BulletSource`.
+    A `Stack` can also be fanned out.
+
+    Parameters
+    ----------
+    bullet_source: BulletSource
+        The preconfigured bullet source, consisting of a ring and a heartbeat.
+        See above.
+    arc: float
+        The angle width of the fan, centered around the initial bullet position.
+    steps: int
+        The number of steps the fan is segmented into.
+    """
     def __init__(self, bullet_source, arc, steps):
         self.bullet_source = bullet_source
         self.arc = arc
@@ -358,6 +414,40 @@ class Fan:
 
 
 class Factory:
+    """A bullet pattern factory.
+
+    The `Factory` will take the emit signals from a `BulletSource` and call a
+    sprite factory for every emitted bullet.
+
+    The sprite factory will receive a position and a momentum vector from the
+    factory.  By default, the position vector of the Ring will be centered at
+    `(0, 0)`.  If the Factory has a POMS attribute (see below), its position
+    will be added to the position vector from the `Ring`.
+
+    The momentum vector will be normalized (set to length 0), and needs to be
+    scaled up with the required bullet speed by the sprite factory.  If the
+    `Factory` has a `POMS` attribute with `orientation`, the momentum vector
+    for the bullet will be rotated by that amount.
+
+    If the `Factory` has a `POMS` attribute with momentum, that is passed as
+    `factory_momentum` kwarg to the sprite factory.
+
+    To pre-configure a sprite factory, use a partial that feeds in all
+    required settings, or write a custom class that supports `call`.
+
+    Besides a `POMS`, the `Factory` will also accept a list of mutators that
+    can modify the `POMS` e.g. move or rotate the Factory across the screen.
+
+    Parameters
+    ----------
+    bullet_source: BulletSource
+        A preconfigured bullet source.  See above.
+    sprite_factory: Callable
+        A callback that creates a sprite from a position and momentum vector.
+    poms: POMS = None
+        Optional (P)osition, (O)rientation, (M)omentum and (S)pin for the Factory.
+
+    """
     def __init__(self, bullet_source, sprite_factory, poms=None, mutators=None):
         self.bullet_source = bullet_source
         self.sprite_factory = sprite_factory
