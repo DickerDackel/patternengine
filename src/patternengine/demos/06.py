@@ -55,14 +55,15 @@ def danmaku_demo_00(position, sprite_factory):
 
     bullets = 24
     ring = pe.Ring(0, bullets)
-    heartbeat = pe.Heartbeat(0.5, '###.........')
+    heartbeat = pe.Heartbeat(0.5, '#')
     bullet_source = pe.BulletSource(bullets, ring, heartbeat)
+    stack = pe.Stack(bullet_source, height=3, gain=1.05)
 
     sprite_factory_ = partial(sprite_factory, anchor=position,
                               bullet_speed=-BULLET_SPEED,
                               image=image)
 
-    return pe.Factory(bullet_source, sprite_factory_)
+    return pe.Factory(stack, sprite_factory_)
 
 
 def danmaku_demo_01(position, sprite_factory):
@@ -90,36 +91,26 @@ def danmaku_demo_01(position, sprite_factory):
                 self.parent.mutator.add(AlignWithMomentumMutator(self.parent))
                 poms.max_speed = self.max_speed
 
-    image = pe.bullets.merge(pe.bullets.ARROWHEADS['medium-ring-danmaku-green'](),
-                             pe.bullets.CORES['medium-lightblue']())
-
-    bullets = 8
-    ring = pe.Ring(0, bullets)
-    heartbeat = pe.Heartbeat(2, '.......#####')
-    bullet_source = pe.BulletSource(bullets, ring, heartbeat)
-
-    my_mutator = partial(MyTurnMutator, angle=15, max_speed=150)
-
-    sprite_factory_ = partial(sprite_factory, anchor=position,
-                              bullet_speed=-300, image=image,
-                              acceleration=250,
-                              mutators=[my_mutator])
-
-    return pe.Factory(bullet_source, sprite_factory_)
-
-
-def danmaku_demo_02(position, sprite_factory, target):
-    image = pe.bullets.merge(pe.bullets.OVALS['small-ring-magenta'](),
+    image = pe.bullets.merge(pe.bullets.ARROWHEADS['small-ring-danmaku-green'](),
                              pe.bullets.CORES['small-lightblue']())
 
     bullets = 8
-    ring = pe.Ring(0, bullets, aim=-30, width=60, randomize=True)
+    ring = pe.Ring(0, bullets)
+    heartbeat = pe.Heartbeat(2.5, '#')
+    aim = LerpThing(0, 360, 10, repeat=1)
+    bullet_source = pe.BulletSource(bullets, ring, heartbeat, aim)
+    stack = pe.Stack(bullet_source, height=5, gain=1.1)
 
-    heartbeat = pe.Heartbeat(3, '................................################')
-    bullet_source = pe.BulletSource(bullets, ring, heartbeat)
+    my_mutator = partial(MyTurnMutator, angle=25, max_speed=150)
+    sprite_factory_ = partial(sprite_factory, anchor=position,
+                              bullet_speed=-200, image=image,
+                              acceleration=150,
+                              mutators=[my_mutator])
 
-    poms = POMS(position)
+    return pe.Factory(stack, sprite_factory_)
 
+
+def danmaku_demo_02(position, sprite_factory, target):
     class AimFactoryMutator(Mutator):
         def __init__(self, parent, target):
             super().__init__(parent)
@@ -150,6 +141,16 @@ def danmaku_demo_02(position, sprite_factory, target):
             v = glm.normalize(p1 - p0) * self.force
 
             self.parent.poms.momentum += v * dt
+
+    image = pe.bullets.merge(pe.bullets.OVALS['tiny-ring-magenta'](),
+                             pe.bullets.CORES['tiny-lightblue']())
+
+    bullets = 8
+    ring = pe.Ring(0, bullets, aim=-30, width=60, randomize=True)
+    heartbeat = pe.Heartbeat(3, '................########')
+    bullet_source = pe.BulletSource(bullets, ring, heartbeat)
+
+    poms = POMS(position)
 
     thrust = partial(AccelerateTowardsTargetMutator,
                      target=target, force=350, duration=2.5)
