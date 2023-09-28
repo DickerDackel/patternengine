@@ -19,10 +19,12 @@ classifiers = [
 dependencies = [
     "pygame-ce",
     "pgcooldown",
+    "pyglm"
 ]
 
 [project.scripts]
 patternengine-example = "patternengine.example:main"
+demo = "patternengine.demos:main"
 
 [project.urls]
 homepage = "https://github.com/dickerdackel/patternengine"

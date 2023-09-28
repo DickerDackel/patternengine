@@ -26,7 +26,7 @@ class Bullet(pygame.sprite.Sprite):
         pygame.draw.circle(self.image, 'white', self.rect.center, self.rect.centerx)
 
     def update(self, dt):
-        if self.lifetime.cold:
+        if self.lifetime.cold():
             self.kill
             return
 
