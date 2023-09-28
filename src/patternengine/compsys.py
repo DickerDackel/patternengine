@@ -49,9 +49,9 @@ def bullet_source_system(dt, eid, bullet_source, bullet_factory, position):
     bullet_source: patternengine.BulletSource
         The `BulletSource` component to trigger the emits.
 
-    bullet_factory: Callable[[pygame.Vector2, pygame.Vector2] -> hashable
+    bullet_factory: Callable[[glm.vec2, glm.vec2] -> hashable
         The `bullet_factory` is a function that receives `position` and
-        `momentum` as `Vector2` and returns the entity id as result.
+        `momentum` as `glm.vec2` and returns the entity id as result.
 
     Returns
     -------
@@ -76,7 +76,7 @@ def aim_ring_system(dt, eid, bullet_source, position, target):
     bullet_source: patternengine.BulletSource
         The `BulletSource` component to control
 
-    position: Vector2
+    position: glm.vec2
         The position component of the emitter entity to calculate the vector
         towards the target.
 

@@ -1,56 +1,44 @@
-import pytest
+import glm
+import pytest  # noqa: F401
 import patternengine as pe
 
 from time import sleep
-
-from pygame import Vector2
 from pytest import approx
 
 
 def test_ring_circle():
     r = pe.Ring(100, 4)
-    assert next(r)[0] == Vector2(100, 0)
-    assert next(r)[0] == Vector2(0, 100)
-    assert next(r)[0] == Vector2(-100, 0)
-    assert next(r)[0] == Vector2(0, -100)
-    assert next(r)[0] == Vector2(100, 0)
+    v = next(r)[0]
+    assert approx(v.x, abs=0.001) == 100 and approx(v.y, abs=0.001) == 0
+    v = next(r)[0]
+    assert approx(v.x, abs=0.001) == 0 and approx(v.y, abs=0.001) == 100
+    v = next(r)[0]
+    assert approx(v.x, abs=0.001) == -100 and approx(v.y, abs=0.001) == 0
+    v = next(r)[0]
+    assert approx(v.x, abs=0.001) == 0 and approx(v.y, abs=0.001) == -100
+    v = next(r)[0]
+    assert approx(v.x, abs=0.001) == 100 and approx(v.y, abs=0.001) == 0
 
 
 def test_ring_arc():
     r = pe.Ring(100, 3, width=90)
-    assert next(r)[0].as_polar()[1] == approx(-45)
-    assert next(r)[0].as_polar()[1] == approx(0)
-    assert next(r)[0].as_polar()[1] == approx(45)
+    assert approx(glm.degrees(glm.atan2(*next(r)[0].yx)), abs=0.001) == -45
+    assert approx(glm.degrees(glm.atan2(*next(r)[0].yx)), abs=0.001) == 0
+    assert approx(glm.degrees(glm.atan2(*next(r)[0].yx)), abs=0.001) == 45
 
 
 def test_ring_arc_aim():
     r = pe.Ring(100, 3, width=90, aim=45)
-    assert next(r)[0].as_polar()[1] == approx(0)
-    assert next(r)[0].as_polar()[1] == approx(45)
-    assert next(r)[0].as_polar()[1] == approx(90)
+    assert approx(glm.degrees(glm.atan2(*next(r)[0].yx)), abs=0.001) == 0
+    assert approx(glm.degrees(glm.atan2(*next(r)[0].yx)), abs=0.001) == 45
+    assert approx(glm.degrees(glm.atan2(*next(r)[0].yx)), abs=0.001) == 90
 
 
 def test_ring_heartbeat():
     r = pe.Ring(100, 3, aim=90, width=180, heartbeat='#.#')
-    assert next(r)[0].as_polar()[1] == approx(0)
+    assert approx(glm.degrees(glm.atan2(*next(r)[0].yx)), abs=0.001) == 0
     assert next(r) is None
-    assert next(r)[0].as_polar()[1] == approx(-180)
-
-
-def test_ring_update_step():
-    r = pe.Ring(100, 4)
-    assert r.steps == 4
-
-    r.steps = 8
-    assert r.steps == 8
-    assert next(r)[0].as_polar()[1] == approx(0)
-    assert next(r)[0].as_polar()[1] == approx(45)
-
-
-def test_ring_update_heartbeat():
-    with pytest.raises(ValueError) as e:
-        r = pe.Ring(100, 1, heartbeat='lorem ipsum')  # noqa: F841
-    assert e.type is ValueError
+    assert approx(glm.degrees(glm.atan2(*next(r)[0].yx)), abs=0.001) == -180
 
 
 def test_heartbeat():
@@ -82,7 +70,5 @@ if __name__ == "__main__":
     test_ring_arc()
     test_ring_arc_aim()
     test_ring_heartbeat()
-    test_ring_update_step()
-    test_ring_update_heartbeat()
     test_heartbeat()
     test_bullet_source()

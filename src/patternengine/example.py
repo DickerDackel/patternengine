@@ -2,7 +2,7 @@ import pygame
 import patternengine as pe
 
 from pgcooldown import Cooldown
-from pygame import Vector2
+from glm import vec2
 
 
 TITLE = 'Minimal patternengine example'
@@ -59,7 +59,7 @@ def main():
     #
     ########################################################################
 
-    anchor = Vector2(SCREEN.centerx, SCREEN.height / 3 * 2)
+    anchor = vec2(SCREEN.centerx, SCREEN.height / 3 * 2)
     bullet_speed = 100
 
     running = True
