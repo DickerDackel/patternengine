@@ -464,6 +464,7 @@ class Factory:
 
         for position, momentum in next(self.bullet_source):
             if angle:
+                position = glm.rotate(position, angle)
                 momentum = glm.rotate(momentum, angle)
             self.sprite_factory(position + self.poms.position,
                                 momentum, factory_momentum=self.poms.momentum)
