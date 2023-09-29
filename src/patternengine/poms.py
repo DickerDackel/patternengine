@@ -11,7 +11,24 @@ FIXME
 import glm
 
 from abc import ABC, abstractmethod
+from pgcooldown import Cooldown
 from patternengine.peglm import clamp
+
+__all__ = [
+    'POMS',
+    'Mutator',
+    'AccelerationMutator',
+    'AimTargetMutator',
+    'AlignWithAccelerationMutator',
+    'AlignWithMomentumMutator',
+    'AlignWithTargetMutator',
+    'BounceMutator',
+    'MomentumMutator',
+    'SpinMutator',
+    'TurnMutator',
+    'WorldMutator',
+    'LifetimeMutator',
+]
 
 
 class POMS:
@@ -44,6 +61,9 @@ class POMS:
         self.spin = spin
         self.max_speed = max_speed
         self.max_spin = max_spin
+
+    def __repr__(self):
+        return f'{__class__}({repr(self.position)}, {self.orientation}, {repr(self.momentum)}, {self.spin})'
 
 
 class MutatorStack(dict):
@@ -240,6 +260,55 @@ class AlignWithAccelerationMutator(Mutator):
 
     def __call__(self, dt):
         poms = getattr(self.parent, self.poms)
-        accel = self.parent.mutator[AccelerationMutator].acceleration
+        accel = self.parent.mutators[AccelerationMutator].acceleration
 
         poms.orientation = glm.degrees(glm.atan2(*accel) - glm.half_pi())
+
+
+class WorldMutator(Mutator):
+    def __init__(self, parent, world, poms='poms'):
+        super().__init__(parent)
+        self.world = world
+        self.poms = poms
+
+    def __call__(self, dt):
+        poms = getattr(self.parent, self.poms)
+        if not self.world.collidepoint(poms.position):
+            # Remove circular referencing of parent in the mutators
+            self.parent.mutators.clear()
+            self.parent.kill()
+
+
+class LifetimeMutator(Mutator):
+    def __init__(self, parent, lifetime):
+        super().__init__(parent)
+        self.lifetime = Cooldown(lifetime)
+
+    def __call__(self, dt):
+        if self.lifetime.cold():
+            # Remove circular referencing of parent in the mutators
+            self.parent.mutator.clear()
+            self.parent.kill()
+
+
+class BounceMutator(Mutator):
+    def __init__(self, parent, world):
+        super().__init__(parent)
+        self.world = world
+
+    def __call__(self, dt):
+        position = self.parent.poms.position
+        momentum = self.parent.poms.momentum
+
+        if position.x > self.world.right:
+            position.x = 2 * self.world.right - position.x
+            momentum.x = -momentum.x
+        elif position.x < self.world.left:
+            position.x = -position.x
+            momentum.x = -momentum.x
+        if position.y > self.world.bottom:
+            position.y = 2 * self.world.bottom - position.y
+            momentum.y = -momentum.y
+        elif position.y < self.world.top:
+            position.y = -position.y
+            momentum.y = -momentum.y
