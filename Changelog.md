@@ -1,4 +1,4 @@
-# v0.0.5
+# v0.0.6
 - Tutorial
 - More mutators, __all__
 - Orientation wasn't inherited from the Factory
