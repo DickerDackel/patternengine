@@ -22,13 +22,13 @@ def sprite_factory(position, momentum, anchor, bullet_speed, image, world,
                    group, target=None, spin=0, **kwargs):
     bullet = Bullet(image, POMS(position + anchor, 0, momentum * bullet_speed, spin),
                     group, world=world)
-    bullet.mutator.add(MomentumMutator(bullet))
+    bullet.mutators.add(MomentumMutator(bullet))
 
     if target:
-        bullet.mutator.add(AimTargetMutator(bullet, target=target))
+        bullet.mutators.add(AimTargetMutator(bullet, target=target))
 
     if spin:
-        bullet.mutator.add(SpinMutator(bullet))
+        bullet.mutators.add(SpinMutator(bullet))
 
 
 def danmaku_demo_00(position, sprite_factory):

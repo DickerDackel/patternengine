@@ -34,17 +34,17 @@ def sprite_factory(position, momentum, *, anchor=None, bullet_speed, image,
                          max_speed=max_speed),
                     group,
                     world=world)
-    bullet.mutator.add(MomentumMutator(bullet))
+    bullet.mutators.add(MomentumMutator(bullet))
 
     if acceleration:
         v = glm.normalize(momentum) * acceleration
-        bullet.mutator.add(AccelerationMutator(bullet, v))
-        bullet.mutator.add(AlignWithAccelerationMutator(bullet))
+        bullet.mutators.add(AccelerationMutator(bullet, v))
+        bullet.mutators.add(AlignWithAccelerationMutator(bullet))
     else:
-        bullet.mutator.add(AlignWithMomentumMutator(bullet))
+        bullet.mutators.add(AlignWithMomentumMutator(bullet))
 
     if mutators:
-        bullet.mutator.add([m(bullet) for m in mutators])
+        bullet.mutators.add([m(bullet) for m in mutators])
 
     return bullet
 
@@ -77,7 +77,7 @@ def danmaku_demo_01(position, sprite_factory):
 
         def __call__(self, dt):
             poms = getattr(self.parent, self.poms)
-            a_mutator = self.parent.mutator[AccelerationMutator]
+            a_mutator = self.parent.mutators[AccelerationMutator]
 
             m_direction = glm.normalize(poms.momentum)
             a_direction = glm.normalize(a_mutator.acceleration)
@@ -86,9 +86,9 @@ def danmaku_demo_01(position, sprite_factory):
                 poms.momentum = glm.rotate(poms.momentum, self.angle)
                 a_mutator.acceleration = glm.rotate(a_mutator.acceleration, self.angle)
 
-                del self.parent.mutator[type(self)]
-                del self.parent.mutator[AlignWithAccelerationMutator]
-                self.parent.mutator.add(AlignWithMomentumMutator(self.parent))
+                del self.parent.mutators[type(self)]
+                del self.parent.mutators[AlignWithAccelerationMutator]
+                self.parent.mutators.add(AlignWithMomentumMutator(self.parent))
                 poms.max_speed = self.max_speed
 
     image = pe.bullets.merge(pe.bullets.ARROWHEADS['small-ring-danmaku-green'](),
@@ -133,7 +133,7 @@ def danmaku_demo_02(position, sprite_factory, target):
 
         def __call__(self, dt):
             if self.duration.cold():
-                del self.parent.mutator[AccelerateTowardsTargetMutator]
+                del self.parent.mutators[AccelerateTowardsTargetMutator]
                 return
 
             p0 = self.parent.poms.position

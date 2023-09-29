@@ -65,20 +65,17 @@ class Bullet(pygame.sprite.Sprite):
 
     image = RSAImage()
 
-    def __init__(self, image, poms, *groups, mutator=None, world=None):
+    def __init__(self, image, poms, *groups, world=None):
         super().__init__(*groups)
 
         self.image = image
         self.poms = poms
         self.rect = image.get_rect(center=poms.position)
 
-        self.mutator = MutatorStack(mutator) if mutator else MutatorStack()
+        self.mutators = MutatorStack()
         self.world = world
 
     def update(self, dt):
-        for m in list(self.mutator.values()): m(dt)
+        for m in list(self.mutators.values()): m(dt)
 
         self.rect.center = self.poms.position
-
-        if self.world and not self.world.collidepoint(self.poms.position):
-            self.kill()

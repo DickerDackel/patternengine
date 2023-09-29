@@ -22,7 +22,6 @@ TURN = 30
 class ZigZagMutator(Mutator):
     def __init__(self, parent, zigzag, cooldown, poms='poms'):
         super().__init__(parent)
-        self.momentum = self.parent.mutator[MomentumMutator]
         self.cd = Cooldown(cooldown)
         self.initial = True
         self.angle = glm.radians(zigzag)
@@ -46,14 +45,14 @@ def sprite_factory(position, momentum, anchor, bullet_speed, image, world,
     bullet = Bullet(image,
                     POMS(position + anchor, 0, momentum * bullet_speed, turn),
                     group, world=world)
-    bullet.mutator.add(MomentumMutator(bullet))
+    bullet.mutators.add(MomentumMutator(bullet))
 
     if turn:
-        bullet.mutator.add(TurnMutator(bullet))
-        bullet.mutator.add(AlignWithMomentumMutator(bullet))
+        bullet.mutators.add(TurnMutator(bullet))
+        bullet.mutators.add(AlignWithMomentumMutator(bullet))
 
     if zigzag:
-        bullet.mutator.add(ZigZagMutator(bullet, zigzag, 1 / 3))
+        bullet.mutators.add(ZigZagMutator(bullet, zigzag, 1 / 3))
 
     return bullet
 
