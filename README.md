@@ -1,4 +1,7 @@
 # patternengine
+
+## tl;dr
+
 A bullet hell pattern engine
 
 Consult the embedded docs for class descriptions and usage.
@@ -45,4 +48,9 @@ for bullet in next(emitter):
 
 with Bullet being a simple subclass of pygame.sprite.Sprite
 
-TBC...
+## Tutorial
+
+Read TUTORIAL.md for exhaustive examples of all the parts.
+
+Additionally, study the sources of the included tutorial scripts and the
+demos, both in the package folder.
