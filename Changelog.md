@@ -1,3 +1,10 @@
+# v0.0.5
+- Tutorial
+- More mutators, __all__
+- Orientation wasn't inherited from the Factory
+- Refactor Bullet attribute mutator to mutators
+- Import POMS and mutators into patternengine namespace
+
 # v0.0.4
 - Big redesign - cleanups pending
 - Added 6 demos to implement patterns from the ph3 tutorial website
