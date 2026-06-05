@@ -36,6 +36,7 @@ def _arc_steps(phi, steps):
 
 def _arc_cycle(arc, steps):
     """Return a cycle over `steps` within `arc`."""
+
     step = arc * _arc_steps(arc, steps)
 
     recenter = 0 if arc == 360 else arc / 2
@@ -287,21 +288,30 @@ class BulletSource:
           ... ]
 
     """
-    def __init__(self, bullets, ring, heartbeat, aim=0):
+    def __init__(self, bullets, ring, heartbeat, aim=0, max_emits=0):
         self.bullets = bullets
         self.ring = ring
         self.heartbeat = heartbeat
         self.aim = aim
+        self.max_emits = max_emits
+        self.emits = 0
 
     def __iter__(self):
         return self
 
     def __next__(self):
+        if self.max_emits and self.emits >= self.max_emits:
+            raise StopIteration
+
         if not next(self.heartbeat):
             return []
 
         res = []
-        for i in range(self.bullets):
+        remaining = self.max_emits - self.emits if self.max_emits else self.bullets
+        for i in range(min(self.bullets, remaining)):
+            if self.max_emits and self.emits >= self.max_emits:
+                break
+
             # Count blanks, but don't add them to res
             if not (bullet := next(self.ring)):
                 continue
@@ -313,6 +323,9 @@ class BulletSource:
                             glm.rotate(momentum, phi)))
             else:
                 res.append((offset, momentum))
+
+            self.emits += 1
+
         return res
 
     @property
