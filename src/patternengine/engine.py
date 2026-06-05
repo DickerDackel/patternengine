@@ -165,14 +165,19 @@ class Ring:
 
     def __next__(self):
         if self.randomize:
-            phi = random() * self.width
+            phi = random() * self.width - self.width / 2
         else:
             phi = next(self.arc)
             if next(self.heartbeat) != '#':
                 return None
 
-        v = vec2(1, 0)
-        v = glm.rotate(v, glm.radians(phi + self._aim()))
+        angle = phi + self._aim()
+
+        if self.jitter:
+            jitter = random() * self.jitter - self.jitter / 2
+            angle += jitter
+        rad = glm.radians(angle)
+        v = glm.rotate(vec2(1, 0), rad)
 
         return v * self.radius, v
 
