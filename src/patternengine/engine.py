@@ -49,13 +49,15 @@ class Ring:
                  aim: float = 0,
                  width: float = 360,
                  randomize: bool = False,
-                 steps: str = '#') -> Generator[tuple[vec2, vec2]]:
+                 steps: str = '#',
+                 jitter: float = 0) -> Generator[tuple[vec2, vec2]]:
         self.radius = radius
         self.segments = segments
         self._aim = aim if callable(aim) else lambda: aim
         self.width = width
         self.randomize = randomize
         self.steps = cycle(steps)
+        self.jitter = jitter
 
         self.arc = _arc_cycle(self.width, self.segments)
 
