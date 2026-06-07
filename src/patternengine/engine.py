@@ -12,20 +12,20 @@ from patternengine.poms import POMS, MutatorStack
 __all__ = ['Ring', 'Heartbeat', 'BulletSource', 'Stack', 'Fan', 'Factory']
 
 
-def _arc_steps(phi, steps):
+def _arc_step(phi, segments):
     """Chunk an arc into steps.
 
     If it's a full circle, don't include both 0 and 360 degrees.
     """
-    return 1 / steps if phi == 360 or steps == 1 else 1 / (steps - 1)
+    return 1 / segments if (phi == 360 or segments == 1) else 1 / (segments - 1)
 
 
-def _arc_cycle(arc, steps):
+def _arc_cycle(arc, segments):
     """Return a cycle over `steps` within `arc`."""
-    step = arc * _arc_steps(arc, steps)
+    step = arc * _arc_step(arc, segments)
 
     recenter = 0 if arc == 360 else arc / 2
-    return cycle([step * i - recenter for i in range(steps)])
+    return cycle([step * i - recenter for i in range(segments)])
 
 
 class Ring:
@@ -127,17 +127,22 @@ class Ring:
         2nd vector same as 1st, but normalized to length of 1.
 
     """
-    def __init__(self, radius, steps, aim=0, width=360,
-                 randomize=False, heartbeat='#', jitter=0):
+
+    def __init__(self,
+                 radius: float,
+                 segments: int,
+                 aim: float = 0,
+                 width: float = 360,
+                 randomize: bool = False,
+                 steps: str = '#') -> Generator[tuple[vec2, vec2]]:
         self.radius = radius
-        self.steps = steps
+        self.segments = segments
         self._aim = aim if callable(aim) else lambda: aim
         self.width = width
         self.randomize = randomize
-        self.heartbeat = cycle(heartbeat)
-        self.jitter = jitter
+        self.steps = cycle(steps)
 
-        self.arc = _arc_cycle(self.width, self.steps)
+        self.arc = _arc_cycle(self.width, self.segments)
 
     @property
     def aim(self): return self._aim()  # noqa: E704
@@ -154,7 +159,7 @@ class Ring:
             phi = random() * self.width
         else:
             phi = next(self.arc)
-            if next(self.heartbeat) != '#':
+            if next(self.steps) != '#':
                 return None
 
         v = vec2(1, 0)
@@ -203,7 +208,8 @@ class Heartbeat:
         `True` = Emit command.
 
     """
-    def __init__(self, duration, pattern):
+
+    def __init__(self, duration: float, pattern: str) -> Generator[bool]:
         self.cooldown = Cooldown(duration / len(pattern), cold=True)
         self.c = cycle(pattern)
 
@@ -376,15 +382,15 @@ class Fan:
         See above.
     arc: float
         The angle width of the fan, centered around the initial bullet position.
-    steps: int
-        The number of steps the fan is segmented into.
+    segments: int
+        The number of segments the fan is split into.
     """
-    def __init__(self, bullet_source, arc, steps):
+    def __init__(self, bullet_source, arc, segments):
         self.bullet_source = bullet_source
         self.arc = arc
-        self.steps = steps
+        self.segments = segments
 
-        self.arc = _arc_cycle(arc, steps)
+        self.arc = _arc_cycle(arc, segments)
 
     def __iter__(self):
         return self
@@ -392,7 +398,7 @@ class Fan:
     def __next__(self):
         res = []
         for position, momentum in next(self.bullet_source):
-            for degrees, _ in zip(self.arc, range(self.steps)):
+            for degrees, _ in zip(self.arc, range(self.segments)):
                 phi = glm.radians(degrees)
                 res.append((glm.rotate(position, phi),
                             glm.rotate(momentum, phi)))

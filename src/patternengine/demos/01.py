@@ -51,10 +51,10 @@ def danmaku_demo_01(position, sprite_factory):
                              pe.bullets.CORES['tiny-danmaku-yellow']())
 
     bullets = 4
-    ring = pe.Ring(0, bullets, aim=0, heartbeat='#.#.')
-    heartbeat = pe.Heartbeat(1 / 2.5, '#')
+    ring = pe.Ring(0, bullets, aim=0, steps='#.#.')
+    steps = pe.Heartbeat(1 / 2.5, '#')
     aim = LerpThing(0, 360, 7 / 3, repeat=1)
-    bullet_source = pe.BulletSource(bullets, ring, heartbeat, aim)
+    bullet_source = pe.BulletSource(bullets, ring, steps, aim)
 
     stack_height = 5
     stack_gain = 1.1
@@ -72,10 +72,10 @@ def danmaku_demo_02(position, sprite_factory):
                              pe.bullets.CORES['tiny-danmaku-blue']())
 
     bullets = 4
-    ring = pe.Ring(60, bullets, aim=90, heartbeat='#.#.')
-    heartbeat = pe.Heartbeat(1 / 2.5, '#')
+    ring = pe.Ring(60, bullets, aim=90, steps='#.#.')
+    steps = pe.Heartbeat(1 / 2.5, '#')
     aim = LerpThing(0, 360, 7 / 3, repeat=1)
-    bullet_source = pe.BulletSource(bullets, ring, heartbeat, aim)
+    bullet_source = pe.BulletSource(bullets, ring, steps, aim)
 
     stack_height = 5
     stack_gain = 1.1
