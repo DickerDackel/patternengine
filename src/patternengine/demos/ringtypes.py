@@ -46,103 +46,107 @@ class ZeSprite(pygame.sprite.Sprite):
             self.kill()
 
 
-pygame.init()
-clock = pygame.time.Clock()
-window = pygame.Window(size=SCREEN.size, title=TITLE)
-screen = window.get_surface()
+def main():
+    pygame.init()
+    clock = pygame.time.Clock()
+    window = pygame.Window(size=SCREEN.size, title=TITLE)
+    screen = window.get_surface()
 
-font = pygame.font.SysFont(None, 24)
+    font = pygame.font.SysFont(None, 24)
 
-group = pygame.sprite.Group()
+    group = pygame.sprite.Group()
 
-cell = SCREEN.scale_by(1 / 3).move_to(topleft=(0, 0))
-step_x = SCREEN.width / 3
-step_y = SCREEN.height / 3
-demos = []
+    cell = SCREEN.scale_by(1 / 3).move_to(topleft=(0, 0))
+    step_x = SCREEN.width / 3
+    step_y = SCREEN.height / 3
+    demos = []
 
-rect = cell.move_to(topleft=(0, 0))
-heartbeat = Heartbeat(0.01, '#')
-ring = Circle(20, rng=triangular)
-emitter = BulletSource(3, ring, heartbeat)
-label = font.render('Circle(20, rng=triangular)', True, 'white')
-demos.append((rect, emitter, label))
+    rect = cell.move_to(topleft=(0, 0))
+    heartbeat = Heartbeat(0.01, '#')
+    ring = Circle(20, rng=triangular)
+    emitter = BulletSource(3, ring, heartbeat)
+    label = font.render('Circle(20, rng=triangular)', True, 'white')
+    demos.append((rect, emitter, label))
 
-rect = cell.move_to(topleft=(step_x, 0))
-heartbeat = Heartbeat(0.01, '#')
-ring = Line(45, 100, 8)
-emitter = BulletSource(3, ring, heartbeat)
-label = font.render('Line(45, 100, 8)', True, 'white')
-demos.append((rect, emitter, label))
+    rect = cell.move_to(topleft=(step_x, 0))
+    heartbeat = Heartbeat(0.01, '#')
+    ring = Line(45, 100, 8)
+    emitter = BulletSource(3, ring, heartbeat)
+    label = font.render('Line(45, 100, 8)', True, 'white')
+    demos.append((rect, emitter, label))
 
-rect = cell.move_to(topleft=(2 * step_x, 0))
-heartbeat = Heartbeat(0.01, '#')
-ring = Line(45, 100, randomize=True)
-emitter = BulletSource(3, ring, heartbeat)
-label = font.render('Line(45, 100, randomize=True)', True, 'white')
-demos.append((rect, emitter, label))
+    rect = cell.move_to(topleft=(2 * step_x, 0))
+    heartbeat = Heartbeat(0.01, '#')
+    ring = Line(45, 100, randomize=True)
+    emitter = BulletSource(3, ring, heartbeat)
+    label = font.render('Line(45, 100, randomize=True)', True, 'white')
+    demos.append((rect, emitter, label))
 
-rect = cell.move_to(topleft=(0, step_y))
-heartbeat = Heartbeat(0.01, '#')
-ring = Point()
-emitter = BulletSource(3, ring, heartbeat)
-label = font.render('Point()', True, 'white')
-demos.append((rect, emitter, label))
+    rect = cell.move_to(topleft=(0, step_y))
+    heartbeat = Heartbeat(0.01, '#')
+    ring = Point()
+    emitter = BulletSource(3, ring, heartbeat)
+    label = font.render('Point()', True, 'white')
+    demos.append((rect, emitter, label))
 
-rect = cell.move_to(topleft=(step_x, step_y))
-heartbeat = Heartbeat(0.01, '#')
-ring = Point(0)
-emitter = BulletSource(3, ring, heartbeat)
-label = font.render('Point(0)', True, 'white')
-demos.append((rect, emitter, label))
+    rect = cell.move_to(topleft=(step_x, step_y))
+    heartbeat = Heartbeat(0.01, '#')
+    ring = Point(0)
+    emitter = BulletSource(3, ring, heartbeat)
+    label = font.render('Point(0)', True, 'white')
+    demos.append((rect, emitter, label))
 
-rect = cell.move_to(topleft=(2 * step_x, step_y))
-heartbeat = Heartbeat(0.01, '#')
-ring = Rectangle(100, 33)
-emitter = BulletSource(3, ring, heartbeat)
-label = font.render('Rectangle(100, 33)', True, 'white')
-demos.append((rect, emitter, label))
+    rect = cell.move_to(topleft=(2 * step_x, step_y))
+    heartbeat = Heartbeat(0.01, '#')
+    ring = Rectangle(100, 33)
+    emitter = BulletSource(3, ring, heartbeat)
+    label = font.render('Rectangle(100, 33)', True, 'white')
+    demos.append((rect, emitter, label))
 
-rect = cell.move_to(topleft=(0, 2 * step_y))
-heartbeat = Heartbeat(0.01, '#')
-ring = Ring(50, 12)
-emitter = BulletSource(3, ring, heartbeat)
-label = font.render('Ring(50, 12)', True, 'white')
-demos.append((rect, emitter, label))
+    rect = cell.move_to(topleft=(0, 2 * step_y))
+    heartbeat = Heartbeat(0.01, '#')
+    ring = Ring(50, 12)
+    emitter = BulletSource(3, ring, heartbeat)
+    label = font.render('Ring(50, 12)', True, 'white')
+    demos.append((rect, emitter, label))
 
-rect = cell.move_to(topleft=(step_x, 2 * step_y))
-heartbeat = Heartbeat(0.01, '#')
-ring = Ring(50, 12, randomize=True)
-emitter = BulletSource(3, ring, heartbeat)
-label = font.render('Ring(50, 12, randomize=True)', True, 'white')
-demos.append((rect, emitter, label))
+    rect = cell.move_to(topleft=(step_x, 2 * step_y))
+    heartbeat = Heartbeat(0.01, '#')
+    ring = Ring(50, 12, randomize=True)
+    emitter = BulletSource(3, ring, heartbeat)
+    label = font.render('Ring(50, 12, randomize=True)', True, 'white')
+    demos.append((rect, emitter, label))
 
-rect = cell.move_to(topleft=(2 * step_x, 2 * step_y))
-heartbeat = Heartbeat(0.01, '#')
-ring = Ring(50, 12, width=90, aim=-90, randomize=True)
-emitter = BulletSource(3, ring, heartbeat)
-label = font.render('Ring(50, 12, width=90, aim=-90, randomize=True)', True, 'white')
-demos.append((rect, emitter, label))
+    rect = cell.move_to(topleft=(2 * step_x, 2 * step_y))
+    heartbeat = Heartbeat(0.01, '#')
+    ring = Ring(50, 12, width=90, aim=-90, randomize=True)
+    emitter = BulletSource(3, ring, heartbeat)
+    label = font.render('Ring(50, 12, width=90, aim=-90, randomize=True)', True, 'white')
+    demos.append((rect, emitter, label))
 
-running = True
-while running:
-    dt = min(clock.tick(FPS) / 1000.0, DT_MAX)
+    running = True
+    while running:
+        dt = min(clock.tick(FPS) / 1000.0, DT_MAX)
 
-    for e in pygame.event.get():
-        if e.type == pygame.QUIT:
-            running = False
-        elif e.type == pygame.KEYDOWN:
-            if e.key == pygame.K_ESCAPE:
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
                 running = False
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_ESCAPE:
+                    running = False
 
-    screen.fill('black')
+        screen.fill('black')
 
-    for rect, emitter, label in demos:
-        for pos, momentum in next(emitter):
-            group.add(ZeSprite(vec2(rect.center) + pos, momentum * 75))
-        screen.blit(label, label.get_rect(midbottom=rect.midbottom))
+        for rect, emitter, label in demos:
+            for pos, momentum in next(emitter):
+                group.add(ZeSprite(vec2(rect.center) + pos, momentum * 75))
+            screen.blit(label, label.get_rect(midbottom=rect.midbottom))
 
-    group.update(dt)
-    group.draw(screen)
+        group.update(dt)
+        group.draw(screen)
 
-    window.flip()
-    window.title = f'{TITLE} - time={pygame.time.get_ticks() / 1000:.2f}  fps={clock.get_fps():.2f}'
+        window.flip()
+        window.title = f'{TITLE} - time={pygame.time.get_ticks() / 1000:.2f}  fps={clock.get_fps():.2f}'
+
+if __name__ == "__main__":
+    main()
