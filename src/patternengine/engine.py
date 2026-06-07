@@ -114,6 +114,7 @@ class BulletSource:
     :param heartbeat: A ``Heartbeat`` instance.
     :param aim: Optional, the rotation angle of the bullet source.
     """
+
     def __init__(self, bullets, ring, heartbeat, aim=0):
         self.bullets = bullets
         self.ring = ring
