@@ -2,6 +2,8 @@
 
 import patternengine.bullets  # noqa: F401
 
-from patternengine.engine import *  # noqa: F401, F403
+from patternengine.engine import (BulletSource, Factory, Fan, Heartbeat,
+                                  Stack)
 from patternengine.bullet import *  # noqa: F401, F403
 from patternengine.poms import *  # noqa: F401, F403
+from patternengine.rings import (EmitSource, Circle, Line, Point, Rectangle, Ring)

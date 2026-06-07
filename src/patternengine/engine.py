@@ -3,91 +3,12 @@ from collections.abc import Generator
 import glm
 
 from itertools import cycle
-from random import random
 
 from pgcooldown import Cooldown
 from glm import vec2
 
 from patternengine.poms import POMS, MutatorStack
-
-
-__all__ = ['Ring', 'Heartbeat', 'BulletSource', 'Stack', 'Fan', 'Factory']
-
-
-def _arc_step(phi, segments):
-    """Chunk an arc into steps.
-
-    If it's a full circle, don't include both 0 and 360 degrees.
-    """
-    return 1 / segments if (phi == 360 or segments == 1) else 1 / (segments - 1)
-
-
-def _arc_cycle(arc, segments):
-    """Return a cycle over `segments` within `arc`."""
-
-    step = arc * _arc_step(arc, segments)
-
-    recenter = 0 if arc == 360 else arc / 2
-    return cycle([step * i - recenter for i in range(segments)])
-
-
-class Ring:
-    """A generator for emit coordinates.
-
-    :param radius: The radius of the ring.  Set to ``0`` to emit from the center.
-    :param segments: The number of segments the circle (or arc) is divided into.
-    :param aim: For arcs, this gives the direction the center of the arc is pointing towards in degrees.
-    :param width: The number of degrees the ring covers.  Default is 360, which gives a full circle.  To only create a 1/4 arc, set this to 90.  Note that start and end position will be included.
-    :param steps: A pattern that describes which segment to emit.  *On* is
-        represented by ``#``, all other characters are considered *off*.
-    :param randomize: If ``randomize`` is set, ``steps`` is ignored and coordinates are chosen randomly from the ring.
-    """
-
-    def __init__(self,
-                 radius: float,
-                 segments: int,
-                 aim: float = 0,
-                 width: float = 360,
-                 randomize: bool = False,
-                 steps: str = '#',
-                 jitter: float = 0) -> Generator[tuple[vec2, vec2]]:
-        self.radius = radius
-        self.segments = segments
-        self._aim = aim if callable(aim) else lambda: aim
-        self.width = width
-        self.randomize = randomize
-        self.steps = cycle(steps)
-        self.jitter = jitter
-
-        self.arc = _arc_cycle(self.width, self.segments)
-
-    @property
-    def aim(self): return self._aim()  # noqa: E704
-
-    @aim.setter
-    def aim(self, aim):
-        self._aim = aim if callable(aim) else lambda: aim
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self.randomize:
-            phi = random() * self.width - self.width / 2
-        else:
-            phi = next(self.arc)
-            if next(self.steps) != '#':
-                return None
-
-        angle = phi + self._aim()
-
-        if self.jitter:
-            jitter = random() * self.jitter - self.jitter / 2
-            angle += jitter
-        rad = glm.radians(angle)
-        v = glm.rotate(vec2(1, 0), rad)
-
-        return v * self.radius, v
+from patternengine.rings import _arc_cycle
 
 
 class Heartbeat:
@@ -96,7 +17,6 @@ class Heartbeat:
     :param duration: The duration of a full cycle of emits in seconds.
     :param pattern: A string containing on/off character symbols.  *On* is
         represented by ``#``, all other characters are considered *off*.
-
     """
 
     def __init__(self, duration: float, pattern: str) -> Generator[bool]:
@@ -124,6 +44,7 @@ class BulletSource:
     :param max_emits: An optional hard limit on the number of emits
     :raises StopIteration: When max_emits is given and reached
     """
+
     def __init__(self, bullets, ring, heartbeat, aim=0, max_emits=0):
         self.bullets = bullets
         self.ring = ring
@@ -200,6 +121,7 @@ class Factory:
         Optional (P)osition, (O)rientation, (M)omentum and (S)pin for the Factory.
 
     """
+
     def __init__(self, bullet_source, sprite_factory, poms=None, mutators=None):
         self.bullet_source = bullet_source
         self.sprite_factory = sprite_factory
@@ -297,6 +219,7 @@ class Fan:
     segments: int
         The number of segments the fan is split into.
     """
+
     def __init__(self, bullet_source, arc, segments):
         self.bullet_source = bullet_source
         self.arc = arc
