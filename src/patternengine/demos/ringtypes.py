@@ -32,7 +32,7 @@ class ZeSprite(pygame.sprite.Sprite):
         self.pos = vec2(pos)
         self.momentum = momentum
         self.rect = ZeSprite.image.get_rect(center=glm.round(self.pos))
-        self.cooldown = Cooldown(1)
+        self.cooldown = Cooldown(2)
 
     def update(self, dt):
         if self.cooldown.cold():
@@ -69,9 +69,9 @@ def main():
     demos.append((rect, emitter, label))
 
     rect = cell.move_to(topleft=(step_x, 0))
-    heartbeat = Heartbeat(0.01, '#')
+    heartbeat = Heartbeat(0.5, '#')
     ring = Line(45, 100, 8)
-    emitter = BulletSource(3, ring, heartbeat)
+    emitter = BulletSource(1, ring, heartbeat)
     label = font.render('Line(45, 100, 8)', True, 'white')
     demos.append((rect, emitter, label))
 
@@ -90,9 +90,9 @@ def main():
     demos.append((rect, emitter, label))
 
     rect = cell.move_to(topleft=(step_x, step_y))
-    heartbeat = Heartbeat(0.01, '#')
+    heartbeat = Heartbeat(0.5, '#')
     ring = Point(0)
-    emitter = BulletSource(3, ring, heartbeat)
+    emitter = BulletSource(1, ring, heartbeat)
     label = font.render('Point(0)', True, 'white')
     demos.append((rect, emitter, label))
 
@@ -104,9 +104,9 @@ def main():
     demos.append((rect, emitter, label))
 
     rect = cell.move_to(topleft=(0, 2 * step_y))
-    heartbeat = Heartbeat(0.01, '#')
+    heartbeat = Heartbeat(0.25, '#')
     ring = Ring(50, 12)
-    emitter = BulletSource(3, ring, heartbeat)
+    emitter = BulletSource(1, ring, heartbeat)
     label = font.render('Ring(50, 12)', True, 'white')
     demos.append((rect, emitter, label))
 
@@ -132,7 +132,7 @@ def main():
             if e.type == pygame.QUIT:
                 running = False
             elif e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_ESCAPE:
+                if e.key == pygame.K_ESCAPE or e.key == pygame.K_q and e.mod & pygame.KMOD_CTRL:
                     running = False
 
         screen.fill('black')
@@ -144,6 +144,9 @@ def main():
 
         group.update(dt)
         group.draw(screen)
+
+        for rect, _, _ in demos:
+            pygame.draw.circle(screen, 'red', rect.center, 4, width=2)
 
         window.flip()
         window.title = f'{TITLE} - time={pygame.time.get_ticks() / 1000:.2f}  fps={clock.get_fps():.2f}'
