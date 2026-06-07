@@ -142,12 +142,7 @@ class BulletSource:
                 res.append((offset, momentum))
         return res
 
-    @property
-    def aim(self): return self._aim()  # noqa: E704
 
-    @aim.setter
-    def aim(self, aim):
-        self._aim = aim if callable(aim) else lambda: aim
     """A bullet pattern factory.
 
     The `Factory` will take the emit signals from a `BulletSource` and call a
