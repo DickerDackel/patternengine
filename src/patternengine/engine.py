@@ -1,3 +1,5 @@
+from collections.abc import Generator
+
 import glm
 
 from itertools import cycle
