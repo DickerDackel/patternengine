@@ -23,7 +23,8 @@ def _arc_step(phi, segments):
 
 
 def _arc_cycle(arc, segments):
-    """Return a cycle over `steps` within `arc`."""
+    """Return a cycle over `segments` within `arc`."""
+
     step = arc * _arc_step(arc, segments)
 
     recenter = 0 if arc == 360 else arc / 2
@@ -70,14 +71,19 @@ class Ring:
 
     def __next__(self):
         if self.randomize:
-            phi = random() * self.width
+            phi = random() * self.width - self.width / 2
         else:
             phi = next(self.arc)
             if next(self.steps) != '#':
                 return None
 
-        v = vec2(1, 0)
-        v = glm.rotate(v, glm.radians(phi + self._aim()))
+        angle = phi + self._aim()
+
+        if self.jitter:
+            jitter = random() * self.jitter - self.jitter / 2
+            angle += jitter
+        rad = glm.radians(angle)
+        v = glm.rotate(vec2(1, 0), rad)
 
         return v * self.radius, v
 
@@ -113,23 +119,33 @@ class BulletSource:
     :param ring: A ``Ring`` instance.
     :param heartbeat: A ``Heartbeat`` instance.
     :param aim: Optional, the rotation angle of the bullet source.
+    :param max_emits: An optional hard limit on the number of emits
+    :raises StopIteration: When max_emits is given and reached
     """
-
-    def __init__(self, bullets, ring, heartbeat, aim=0):
+    def __init__(self, bullets, ring, heartbeat, aim=0, max_emits=0):
         self.bullets = bullets
         self.ring = ring
         self.heartbeat = heartbeat
         self.aim = aim
+        self.max_emits = max_emits
+        self.emits = 0
 
     def __iter__(self):
         return self
 
     def __next__(self):
+        if self.max_emits and self.emits >= self.max_emits:
+            raise StopIteration
+
         if not next(self.heartbeat):
             return []
 
         res = []
-        for i in range(self.bullets):
+        remaining = self.max_emits - self.emits if self.max_emits else self.bullets
+        for i in range(min(self.bullets, remaining)):
+            if self.max_emits and self.emits >= self.max_emits:
+                break
+
             # Count blanks, but don't add them to res
             if not (bullet := next(self.ring)):
                 continue
@@ -141,6 +157,9 @@ class BulletSource:
                             glm.rotate(momentum, phi)))
             else:
                 res.append((offset, momentum))
+
+            self.emits += 1
+
         return res
 
 
