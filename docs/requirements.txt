@@ -1,0 +1,7 @@
+build
+setuptools
+sphinx
+sphinx-autobuild
+myst-parser
+furo
+tinyecs

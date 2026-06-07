@@ -29,103 +29,15 @@ def _arc_cycle(arc, segments):
 
 
 class Ring:
-    """A ring shaped generator for bullet positions and momentum.
+    """A generator for emit coordinates.
 
-    Returns a generator object that provides the `BulletSource` class with an
-    endless supply of projectiles.
-
-    This class is probably not used itself directly.  It is just configuration
-    for the `BulletSource` below.
-
-    Right now, this is the only shape, and most examples of shmups I've seen
-    don't use anything else.  Lines e.g. are rather uncommon, in contrast to
-    normal particle systems.
-
-    Bullets are emitted from along the rim of the ring the size being
-    `radius`.
-
-    To aim bullets or constraint the area the ring fires at can be controlled
-    by the `aim` and `width`. The `aim` is the angle of the middle of the
-    emitting arc, while the `width` is its angular size.
-
-    Note, that aim can also be a callable that is expected to generate angles.
-
-    `steps` controls into how much emitting points the arc or circle is split
-    into.  The bullets will be emitted clockwise and in infinite number.
-
-    `heartbeat` makes it possible to create bullet patterns within the ring or
-    arc, e.g. 3 bullets besides each other, followed by a gap.
-
-    Note that by making the length of `heartbeat` differ from `steps`, the
-    ring can create irregular patterns.
-
-    `randomize` overrides step and just gives random positions on the arc.
-
-    The ring returns a tuple of a vector from its center to the position where
-    the bullet is emitted from, and the same vector normalized to be used to
-    control the speed and direction of the bullet.
-
-    Note:
-    -----
-    The ring doesn't have a position, it only gives the emitted
-    positions relative to its center.
-
-    Note:
-    -----
-    When configured as an arc, start and end degrees specified by `width` are
-    included while emitting.
-
-    In the case of a full circle, that is not the case, since 0 and 360
-    degrees would result in twice as much emits as all other steps.
-
-    This is calculated by this method, which returns normalized steps in an
-    interval from 0 - 1.
-
-        l = 1 / steps if width % 360 == 0 else 1 / (steps - 1)
-
-    Parameters
-    ----------
-    radius: float
-        Radius of the ring
-
-    steps: int
-        Number of steps the ring (or arc) is devided into.
-
-    aim: float = 0 | Callable[[], float]
-        If creating an arc, this is controls the direction the arc points
-        towards in degrees with 0 degrees being right.
-
-        If this is a callable, then it will be called and is expected to
-        return an angle.  To provide automatic rotation, e.g. use a
-        `LerpThing(0, 360, duration)`
-
-    width: float = 360
-        Limit the angle of the arc.  Default is the full circle.  The arc is
-        spread over `width / 2` to the left and right of `aim`
-
-    randomize: bool = False
-        Ignore `steps`, just emit from random points on the ring/arc.
-
-    jitter: float = 0
-        Amount of jitter in degrees that a bullet can vary from its actual path
-
-    Attributes
-    ----------
-    `radius`, `aim`, `width`, `randomize` parameters above are also available
-    as attributes and can be modified in runtime.
-
-    `steps` can not be used as an attribute, since it is only used once to
-    initialize the generator.
-
-    Returns
-    -------
-    Generator[tuple[vec2, vec2]]
-
-        1st vector of length `radius`, pointing from the origin to the launch
-        spot on the ring/arc
-
-        2nd vector same as 1st, but normalized to length of 1.
-
+    :param radius: The radius of the ring.  Set to ``0`` to emit from the center.
+    :param segments: The number of segments the circle (or arc) is divided into.
+    :param aim: For arcs, this gives the direction the center of the arc is pointing towards in degrees.
+    :param width: The number of degrees the ring covers.  Default is 360, which gives a full circle.  To only create a 1/4 arc, set this to 90.  Note that start and end position will be included.
+    :param steps: A pattern that describes which segment to emit.  *On* is
+        represented by ``#``, all other characters are considered *off*.
+    :param randomize: If ``randomize`` is set, ``steps`` is ignored and coordinates are chosen randomly from the ring.
     """
 
     def __init__(self,
@@ -169,43 +81,11 @@ class Ring:
 
 
 class Heartbeat:
-    """A generator for bullet emit events.
+    """A generator for emit signals to be used with ``BulletSource``
 
-    The heartbeat is a string of arbitrary length where each pound sign stands
-    for an emit.  The whole string is mapped onto a given time interval.
-
-    Beat patterns can be easily created with this method.
-
-    Given 2s interval and the pattern '#.......#.......' as input, the
-    heartbeat, the program can pull the `next` value out of the heartbeat.
-    Only if the proper time (duration / len(string)) has passed, *and* the
-    next char is a pound sign, the result is `True`, otherwise it's false.
-
-    Since *all* other characters are ignored, one can use above notation to
-    visualize the beats, or embed the pound signs in counting digits like so:
-
-        '#123#567#901#345'
-
-    This way, it's easy to synchronize multiple bullet emitters by constructing their interval and heartbeats the same:
-
-        a. '#.......#.......'
-        b. '# #.....#.#.....'
-        c. '.....#.......#..'
-
-    Parameters
-    ----------
-    duration: pgcooldown.Cooldown | float
-        A cooldown can be put in here directly, but if all patterns are
-        predefined, it's useful to pass a float instead, since a cooldown
-        would start to run as soon as it's instantiated.
-
-    pattern: str
-        The actual pattern.
-
-    Returns
-    -------
-    Generator[bool]
-        `True` = Emit command.
+    :param duration: The duration of a full cycle of emits in seconds.
+    :param pattern: A string containing on/off character symbols.  *On* is
+        represented by ``#``, all other characters are considered *off*.
 
     """
 
@@ -225,54 +105,12 @@ class Heartbeat:
 
 
 class BulletSource:
-    """A generator for bullet patterns.
+    """A generator to emit lists of bullet coordinates.
 
-    This class is the glue between the ring that controls the position and
-    momentum of a bullet, and the heartbeat, that controls when to release
-    bullets.
-
-    Note
-    ----
-    Do not include the  parameter in the Parameters section.
-
-    Parameters
-    ----------
-    bullets: int
-        Number of bullets to emit on a heartbeat.
-
-    ring: patternengine.Ring
-        An instance of the `Ring` class above, that configures position and
-        momentum of bullets.
-
-    heartbeat: patternengine.Heartbeat
-        An instance of the `Heartbeat` class above, to trigger emits at
-        defined intervals.
-
-    aim: float = 0 | Callable[[], float]
-        Alternative to control the `aim` of the `Ring` class.  Can be used to
-        point an arc towards a specific direction, e.g. a vector to a target.
-
-        If this is a callable, then it will be called and is expected to
-        return an angle.  To provide automatic rotation, e.g. use a
-        `LerpThing(0, 360, duration)`
-
-
-    Attributes
-    ----------
-    None
-
-    Returns
-    -------
-    Generator[list[tuple[vec2, vec2]]]
-
-        A list of bullets.  A bullet is a tuple of two vectors, one pointing
-        from its center to the emit point on the arc, the other giving the
-        direction to be used as a multiplier with a bullet speed.
-
-        [ (v_a, v_a_normalized),
-          (v_b, b_b_normalized),
-          ... ]
-
+    :param bullets: Number of bullets to create in a single emit event.
+    :param ring: A ``Ring`` instance.
+    :param heartbeat: A ``Heartbeat`` instance.
+    :param aim: Optional, the rotation angle of the bullet source.
     """
     def __init__(self, bullets, ring, heartbeat, aim=0):
         self.bullets = bullets
@@ -308,8 +146,40 @@ class BulletSource:
     @aim.setter
     def aim(self, aim):
         self._aim = aim if callable(aim) else lambda: aim
+    """A bullet pattern factory.
 
+    The `Factory` will take the emit signals from a `BulletSource` and call a
+    sprite factory for every emitted bullet.
 
+    The sprite factory will receive a position and a momentum vector from the
+    factory.  By default, the position vector of the Ring will be centered at
+    `(0, 0)`.  If the Factory has a POMS attribute (see below), its position
+    will be added to the position vector from the `Ring`.
+
+    The momentum vector will be normalized (set to length 0), and needs to be
+    scaled up with the required bullet speed by the sprite factory.  If the
+    `Factory` has a `POMS` attribute with `orientation`, the momentum vector
+    for the bullet will be rotated by that amount.
+
+    If the `Factory` has a `POMS` attribute with momentum, that is passed as
+    `factory_momentum` kwarg to the sprite factory.
+
+    To pre-configure a sprite factory, use a partial that feeds in all
+    required settings, or write a custom class that supports `call`.
+
+    Besides a `POMS`, the `Factory` will also accept a list of mutators that
+    can modify the `POMS` e.g. move or rotate the Factory across the screen.
+
+    Parameters
+    ----------
+    bullet_source: BulletSource
+        A preconfigured bullet source.  See above.
+    sprite_factory: Callable
+        A callback that creates a sprite from a position and momentum vector.
+    poms: POMS = None
+        Optional (P)osition, (O)rientation, (M)omentum and (S)pin for the Factory.
+
+    """
 class Stack:
     """Stack an emitted ring.
 
@@ -406,40 +276,6 @@ class Fan:
 
 
 class Factory:
-    """A bullet pattern factory.
-
-    The `Factory` will take the emit signals from a `BulletSource` and call a
-    sprite factory for every emitted bullet.
-
-    The sprite factory will receive a position and a momentum vector from the
-    factory.  By default, the position vector of the Ring will be centered at
-    `(0, 0)`.  If the Factory has a POMS attribute (see below), its position
-    will be added to the position vector from the `Ring`.
-
-    The momentum vector will be normalized (set to length 0), and needs to be
-    scaled up with the required bullet speed by the sprite factory.  If the
-    `Factory` has a `POMS` attribute with `orientation`, the momentum vector
-    for the bullet will be rotated by that amount.
-
-    If the `Factory` has a `POMS` attribute with momentum, that is passed as
-    `factory_momentum` kwarg to the sprite factory.
-
-    To pre-configure a sprite factory, use a partial that feeds in all
-    required settings, or write a custom class that supports `call`.
-
-    Besides a `POMS`, the `Factory` will also accept a list of mutators that
-    can modify the `POMS` e.g. move or rotate the Factory across the screen.
-
-    Parameters
-    ----------
-    bullet_source: BulletSource
-        A preconfigured bullet source.  See above.
-    sprite_factory: Callable
-        A callback that creates a sprite from a position and momentum vector.
-    poms: POMS = None
-        Optional (P)osition, (O)rientation, (M)omentum and (S)pin for the Factory.
-
-    """
     def __init__(self, bullet_source, sprite_factory, poms=None, mutators=None):
         self.bullet_source = bullet_source
         self.sprite_factory = sprite_factory
