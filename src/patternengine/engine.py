@@ -11,20 +11,6 @@ from patternengine.poms import POMS, MutatorStack
 
 __all__ = ['Ring', 'Heartbeat', 'BulletSource', 'Stack', 'Fan', 'Factory']
 
-########################################################################
-# See Freya Holmer "The simple yet powerful math we don't talk about":
-#     https://www.youtube.com/watch?v=R6UB7mVO3fY
-#
-# This is the "official" lerp, but it's about 10% slower than the one with only
-# a single multiplication below.
-# lerp     = lambda a, b, t: (1 - t) * a + b * t
-#
-lerp     = lambda a, b, t: t * (b - a) + a
-inv_lerp = lambda a, b, v: (v - a) / (b - a)
-remap    = lambda a0, a1, b0, b1, v: lerp(b0, b1, inv_lerp(a0, a1, v))
-#
-########################################################################
-
 
 def _arc_steps(phi, steps):
     """Chunk an arc into steps.
