@@ -143,6 +143,7 @@ class BulletSource:
         return res
 
 
+class Factory:
     """A bullet pattern factory.
 
     The `Factory` will take the emit signals from a `BulletSource` and call a
@@ -177,6 +178,28 @@ class BulletSource:
         Optional (P)osition, (O)rientation, (M)omentum and (S)pin for the Factory.
 
     """
+    def __init__(self, bullet_source, sprite_factory, poms=None, mutators=None):
+        self.bullet_source = bullet_source
+        self.sprite_factory = sprite_factory
+        self.poms = poms if poms else POMS(vec2(), 0, vec2(), 0)
+        self.mutators = MutatorStack()
+        if mutators:
+            for m in mutators:
+                self.mutators.add(m)
+
+    def update(self, dt):
+        self.mutators.run(dt)
+
+        angle = glm.radians(self.poms.orientation)
+
+        for position, momentum in next(self.bullet_source):
+            if angle:
+                position = glm.rotate(position, angle)
+                momentum = glm.rotate(momentum, angle)
+            self.sprite_factory(position + self.poms.position,
+                                momentum, factory_momentum=self.poms.momentum)
+
+
 class Stack:
     """Stack an emitted ring.
 
@@ -270,26 +293,3 @@ class Fan:
                 res.append((glm.rotate(position, phi),
                             glm.rotate(momentum, phi)))
         return res
-
-
-class Factory:
-    def __init__(self, bullet_source, sprite_factory, poms=None, mutators=None):
-        self.bullet_source = bullet_source
-        self.sprite_factory = sprite_factory
-        self.poms = poms if poms else POMS(vec2(), 0, vec2(), 0)
-        self.mutators = MutatorStack()
-        if mutators:
-            for m in mutators:
-                self.mutators.add(m)
-
-    def update(self, dt):
-        self.mutators.run(dt)
-
-        angle = glm.radians(self.poms.orientation)
-
-        for position, momentum in next(self.bullet_source):
-            if angle:
-                position = glm.rotate(position, angle)
-                momentum = glm.rotate(momentum, angle)
-            self.sprite_factory(position + self.poms.position,
-                                momentum, factory_momentum=self.poms.momentum)
