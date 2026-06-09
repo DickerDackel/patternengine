@@ -63,13 +63,13 @@ def main():
 
     rect = cell.move_to(topleft=(0, 0))
     heartbeat = Heartbeat(0.01, '#')
-    ring = Circle(20, rng=triangular)
+    ring = Circle(20, rng=glm.diskRand)
     emitter = BulletSource(3, ring, heartbeat)
-    label = font.render('Circle(20, rng=triangular)', True, 'white')
+    label = font.render('Circle(20, rng=glm.diskRand)', True, 'white')
     demos.append((rect, emitter, label))
 
     rect = cell.move_to(topleft=(step_x, 0))
-    heartbeat = Heartbeat(0.5, '#')
+    heartbeat = Heartbeat(0.15, '#')
     ring = Line(45, 100, 8)
     emitter = BulletSource(1, ring, heartbeat)
     label = font.render('Line(45, 100, 8)', True, 'white')
@@ -77,9 +77,9 @@ def main():
 
     rect = cell.move_to(topleft=(2 * step_x, 0))
     heartbeat = Heartbeat(0.01, '#')
-    ring = Line(45, 100, randomize=True)
+    ring = Line(45, 100, randomize=True, rng=lambda: glm.gaussRand(0.5, 0.5))
     emitter = BulletSource(3, ring, heartbeat)
-    label = font.render('Line(45, 100, randomize=True)', True, 'white')
+    label = font.render('Line(45, 100, randomize=True, rng=gaussian)', True, 'white')
     demos.append((rect, emitter, label))
 
     rect = cell.move_to(topleft=(0, step_y))
@@ -104,7 +104,7 @@ def main():
     demos.append((rect, emitter, label))
 
     rect = cell.move_to(topleft=(0, 2 * step_y))
-    heartbeat = Heartbeat(0.25, '#')
+    heartbeat = Heartbeat(0.05, '#')
     ring = Ring(50, 12)
     emitter = BulletSource(1, ring, heartbeat)
     label = font.render('Ring(50, 12)', True, 'white')

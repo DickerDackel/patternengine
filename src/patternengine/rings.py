@@ -20,11 +20,15 @@ class EmitSource(Protocol):
 class Circle:
     """A generate for emits from a circular area
     :param radius: The radius of the emit circle
-    :param rng: Provide an alternative rng, e.g. to bias emits near the center
+    :param rng: Alternative random function
 
     The position will be a random point within the defined circle.  The
     momentum will be a normalized vector from the origin ``(0, 0)`` towards
     that position result.
+
+    The rng is assumed to have the following prototype::
+
+        def rng(radius: float) -> vec2
 
     .. note:: Use :func:`patternengine.Ring` if you want control over the
        direction and arc of the emitted particles.
@@ -32,17 +36,15 @@ class Circle:
 
     def __init__(self,
                  radius: float = 1,
-                 rng: Callable = random) -> Iterator[Emit]:
+                 rng: Callable[[float], vec2] = glm.diskRand) -> Iterator[Emit]:
         self.radius = radius
         self.rng = rng
 
     def __next__(self):
         """Return the next position and momentum"""
 
-        length = self.radius * self.rng()
-        rad = random() * glm.two_pi()
-        momentum = glm.rotate(vec2(1, 0), rad)
-        pos = momentum * length
+        pos = self.rng(self.radius)
+        momentum = glm.normalize(pos)
 
         return pos, momentum
 
@@ -66,6 +68,11 @@ class Line:
     :param emit_angle: The direction of the momentum
     :param repeat: 0: cycle, 1: bounce back & forth
     :param anchor: The anchor point of the emit line (default=0.5, middle)
+
+    The rng is assumed to have the following prototype::
+
+        def rng() -> float  # in the range 0 - 1
+
     """
 
     def __init__(self,
@@ -122,8 +129,7 @@ class Point:
     def __next__(self) -> Emit:
         """Return the next position and momentum"""
 
-        angle = random() * glm.two_pi() if self.angle is None else glm.radians(self.angle)
-        momentum = glm.rotate(vec2(1, 0), angle)
+        momentum = glm.circularRand(1) if self.angle is None else glm.rotate(vec2(1, 0), glm.radians(self.angle))
 
         return vec2(0, 0), momentum
 
@@ -133,9 +139,14 @@ class Rectangle:
 
     :param width: The width of the rectangle
     :param height: The height of the rectangle
-    :param rng: Provide an alternative rng, e.g. to bias emits near the center
+    :param rng: Alternative random function
 
     The rectangle will always have its center at ``(0, 0)``.
+
+    The rng is assumed to have the following prototype::
+
+        def rng() -> float  # in the range 0 - 1
+
     """
 
     def __init__(self,
@@ -176,6 +187,12 @@ class Ring:
     :param steps: A pattern that describes which segment to emit.  *On* is
         represented by ``#``, all other characters are considered *off*.
     :param randomize: If ``randomize`` is set, ``steps`` is ignored and coordinates are chosen randomly from the ring.
+    :param rng: Alternative random function
+
+    The rng is assumed to have the following prototype::
+
+        def rng() -> float  # in the range 0 - 1
+
     """
 
     def __init__(self,
