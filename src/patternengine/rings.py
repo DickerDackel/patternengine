@@ -102,7 +102,10 @@ class Disk:
         self.radius = radius
         self.rng = rng
 
-    def __next__(self):
+    def __iter__(self) -> Iterator[Emit]:
+        return self
+
+    def __next__(self) -> Emit:
         """Return the next position and momentum"""
 
         pos = self.rng(self.radius)
@@ -161,6 +164,9 @@ class Line:
         elif repeat == 1:
             self.cycle = cycle(chain(line_steps, line_steps[-2:0:-1]))
 
+    def __iter__(self) -> Iterator[Emit]:
+        return self
+
     def __next__(self) -> Emit:
         """Return the next position and momentum"""
 
@@ -196,6 +202,9 @@ class Point:
     def __init__(self, angle: float | None = None) -> None:
         self.angle = angle
 
+    def __iter__(self) -> Iterator[Emit]:
+        return self
+
     def __next__(self) -> Emit:
         """Return the next position and momentum"""
 
@@ -229,7 +238,10 @@ class Rectangle:
         self.height = height
         self.rng = rng
 
-    def __next__(self):
+    def __iter__(self) -> Iterator[Emit]:
+        return self
+
+    def __next__(self) -> Emit:
         """Return the next position and momentum"""
 
         pos = vec2(self.rng() * self.width - self.width / 2,
