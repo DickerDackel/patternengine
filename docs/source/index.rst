@@ -5,8 +5,10 @@ patternengine - Bullet Hell Patterns for Shmups
    :caption: Contents:
 
    introduction
+   overview
    api
    helpers
+   helpers-api
    glossary
    license
 
