@@ -10,7 +10,7 @@ from glm import vec2
 from pgcooldown import Cooldown
 from rpeasings import easings
 
-from patternengine import BulletSource, Heartbeat, Line, Circle, Point, Rectangle, Ring
+from patternengine import BulletSource, Heartbeat, Line, Disk, Point, Rectangle, Ring
 
 if environ.get('XDG_SESSION_TYPE', '') == 'wayland':
     environ['SDL_VIDEODRIVER'] = 'wayland'
@@ -63,9 +63,9 @@ def main():
 
     rect = cell.move_to(topleft=(0, 0))
     heartbeat = Heartbeat(0.01, '#')
-    ring = Circle(20, rng=glm.diskRand)
+    ring = Disk(20, rng=glm.diskRand)
     emitter = BulletSource(3, ring, heartbeat)
-    label = font.render('Circle(20, rng=glm.diskRand)', True, 'white')
+    label = font.render('Disk(20, rng=glm.diskRand)', True, 'white')
     demos.append((rect, emitter, label))
 
     rect = cell.move_to(topleft=(step_x, 0))

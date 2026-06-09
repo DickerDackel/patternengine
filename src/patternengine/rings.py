@@ -17,12 +17,12 @@ class EmitSource(Protocol):
         ...
 
 
-class Circle:
+class Disk:
     """A generate for emits from a circular area
-    :param radius: The radius of the emit circle
+    :param radius: The radius of the emit disk
     :param rng: Alternative random function
 
-    The position will be a random point within the defined circle.  The
+    The position will be a random point within the defined disk.  The
     momentum will be a normalized vector from the origin ``(0, 0)`` towards
     that position result.
 
