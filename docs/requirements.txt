@@ -4,4 +4,4 @@ sphinx
 sphinx-autobuild
 myst-parser
 furo
-tinyecs
+git+https://github.com/dickerdackel/patternengine
