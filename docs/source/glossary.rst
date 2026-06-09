@@ -23,5 +23,11 @@ Glossary
       objects.
 
    POMS
-      **P**osition, **O**rientation, **M**omentum, **S**pin
+      **P**\ osition, **O**\ rientation, **M**\ omentum, **S**\ pin
       An object holding dynamics for a bullet or emitter
+
+   shmups
+      Short for Shoot'em up!  Typical arcade games with a flying aircraft,
+      spaceship, witch that shoots enemies that enter the screen.
+
+      See `Wikipedia <https://en.wikipedia.org/wiki/Shoot_%27em_up>`_

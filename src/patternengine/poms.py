@@ -34,25 +34,16 @@ __all__ = [
 class POMS:
     """Container for (P)osition, (O)rientation, (M)omentum, (S)pin.
 
+    :param position: The object's position in 2D space
+    :param orientation: The object's orientation in degrees, defaults to 0
+    :param momentum: The linear momentum (a.k.a. speed) of the object in 2D space
+    :param spin: The angular momentum of the object (a.k.a. rotation speed)
+
     This object is used in many classes to manage position and motion.  It's
     used by `Bullet`, `Factory`, `Ring` and `Fan`.
 
     The class itself doesn't contain any methods, but it provides a defined
     interface for all mutators below.
-
-    Parameters/Attributes
-    ----------
-    position: vec2 | tuple[float, float]
-        The object's position in 2D space
-
-    orientation: float = 0
-        The object's orientation in degrees, defaults to 0
-
-    momentum: vec2 | tuple[float, float] = vec2(0, 0)
-        The linear momentum (a.k.a. speed) of the object in 2D space
-
-    spin: float = 0
-        The angular momentum of the object (a.k.a. rotation speed)
     """
     def __init__(self, position, orientation=0, momentum=None, spin=0, max_speed=0, max_spin=0):
         self.position = glm.vec2(position)
@@ -96,6 +87,8 @@ class MutatorStack(dict):
 class Mutator(ABC):
     """The base class for mutators.
 
+    :param parent: The object that the mutator will manipulate
+
     Mutators are classes that modify attributes in their parent instance.
 
     A mutator e.g. in a sprite that has a POMS attribute for position and
@@ -106,12 +99,8 @@ class Mutator(ABC):
     `__init__`.  This is mandatory.  Also calling `super().__init__(parent)`
     is mandatory.  Everything beyond that is responsibility of the derived
     child class.
-
-    Parameters
-    ----------
-    parent: object
-        The object that the mutator will manipulate
     """
+
     def __init__(self, parent):
         self.parent = parent
 
@@ -136,14 +125,11 @@ class Mutator(ABC):
 class MomentumMutator(Mutator):
     """Update a POMS' position attribute by its momentum.
 
-    Parameters
-    ----------
-    parent: object
-        The parent object
-    poms: str
-        The attribute **name** of the POMS attribute in the parent class
+    :param parent: The parent object
+    :param poms: The attribute **name** of the POMS attribute in the parent class
 
     """
+
     def __init__(self, parent, poms='poms'):
         super().__init__(parent)
         self.poms = poms

@@ -42,4 +42,6 @@ html_theme_options = {
     }
 }
 
+autodoc_typehints = 'description'
+
 nitpicky = False

@@ -15,23 +15,87 @@ type Vector = glm.vec2 | Sequence[float, float]
 class EmitSource(Protocol):
     def __init__(*args, **kwargs) -> Iterator[Emit]:
         ...
+class Ring:
+    """A generator for emit coordinates.
+
+    :param radius: The radius of the ring.  Set to ``0`` to emit from the center.
+    :param segments: The number of segments the circle (or arc) is divided into.
+    :param aim: For arcs, this gives the direction the center of the arc is pointing towards in degrees.
+    :param width: The number of degrees the ring covers.  Default is 360, which gives a full circle.  To only create a 1/4 arc, set this to 90.  Note that start and end position will be included.
+    :param steps: A pattern that describes which segment to emit.  *On* is
+        represented by ``#``, all other characters are considered *off*.
+    :param randomize: If ``randomize`` is set, ``steps`` is ignored and coordinates are chosen randomly from the ring.
+    :param rng: Alternative random function
+
+    The rng is assumed to have the following prototype::
+
+        def rng() -> float  # in the range 0 - 1
+
+    .. note:: "Rings" are not intended to be used directly, but if you do, you
+       get values out of it using ``next(ring)``.
+    """
+
+    def __init__(self,
+                 radius: float,
+                 segments: int,
+                 aim: float = 0,
+                 width: float = 360,
+                 randomize: bool = False,
+                 steps: str = '#',
+                 jitter: float = 0) -> None:
+        self.radius = radius
+        self.segments = segments
+        self.aim = aim
+        self.width = width
+        self.randomize = randomize
+        self.steps = cycle(steps)
+        self.jitter = jitter
+
+        self.arc = _arc_cycle(self.width, self.segments)
+
+    def __iter__(self) -> Iterator[Emit]:
+        return self
+
+    def __next__(self) -> Emit | None:
+        """Return the next position and momentum"""
+
+        if self.randomize:
+            phi = random() * self.width - self.width / 2
+        else:
+            phi = next(self.arc)
+            if next(self.steps) != '#':
+                return None
+
+        angle = phi + self.aim
+
+        if self.jitter:
+            jitter = random() * self.jitter - self.jitter / 2
+            angle += jitter
+        rad = glm.radians(angle)
+        v = glm.rotate(vec2(1, 0), rad)
+
+        return v * self.radius, v
 
 
 class Disk:
-    """A generate for emits from a circular area
+    """A generator for emits from a circular area.
+
     :param radius: The radius of the emit disk
     :param rng: Alternative random function
 
     The position will be a random point within the defined disk.  The
     momentum will be a normalized vector from the origin ``(0, 0)`` towards
-    that position result.
+    that position.
 
     The rng is assumed to have the following prototype::
 
-        def rng(radius: float) -> vec2
+        def rng(radius: float) -> vec2  # returns normalized vector
 
     .. note:: Use :func:`patternengine.Ring` if you want control over the
        direction and arc of the emitted particles.
+
+    .. note:: "Rings" are not intended to be used directly, but if you do, you
+       get values out of it using ``next(ring)``.
     """
 
     def __init__(self,
@@ -58,21 +122,23 @@ def _segmentalize_range(length: float, segments: int) -> float:
 
 
 class Line:
-    """A generator for emits along a line
-    :param pos: The center position of the emit line
+    """A generator for emits along a line.
+
     :param angle: The angle of the emit line
     :param length: The length of the emit line
     :param steps: The number of points on the emit line (including the end point)
+    :param anchor: The anchor point of the emit line (default=0.5, middle)
     :param randomize: Return random positions on the emit line istead of fixed steps
     :param rng: Alternative random function
     :param emit_angle: The direction of the momentum
     :param repeat: 0: cycle, 1: bounce back & forth
-    :param anchor: The anchor point of the emit line (default=0.5, middle)
 
     The rng is assumed to have the following prototype::
 
         def rng() -> float  # in the range 0 - 1
 
+    .. note:: "Rings" are not intended to be used directly, but if you do, you
+       get values out of it using ``next(ring)``.
     """
 
     def __init__(self,
@@ -118,9 +184,15 @@ class Line:
 
 
 class Point:
-    """A generator for emits from a single point
+    """A generator for emits from a single point.
 
     :param angle: The angle towards which to emit bullets, random if ``None``
+
+    Use a ``Ring`` with radius 0 if you need more complex control over the
+    emit direction.
+
+    .. note:: "Rings" are not intended to be used directly, but if you do, you
+       get values out of it using ``next(ring)``.
     """
 
     def __init__(self, angle: float | None = None):
@@ -135,7 +207,7 @@ class Point:
 
 
 class Rectangle:
-    """A generator for emoits from a rectangular area
+    """A generator for emits from a rectangular area.
 
     :param width: The width of the rectangle
     :param height: The height of the rectangle
@@ -147,6 +219,8 @@ class Rectangle:
 
         def rng() -> float  # in the range 0 - 1
 
+    .. note:: "Rings" are not intended to be used directly, but if you do, you
+       get values out of it using ``next(ring)``.
     """
 
     def __init__(self,
@@ -175,63 +249,3 @@ def _arc_cycle(arc: float, segments: int) -> float:
 
     recenter = 0 if arc == 360 else arc / 2
     return cycle([step * arc * i - recenter for i in range(segments)])
-
-
-class Ring:
-    """A generator for emit coordinates.
-
-    :param radius: The radius of the ring.  Set to ``0`` to emit from the center.
-    :param segments: The number of segments the circle (or arc) is divided into.
-    :param aim: For arcs, this gives the direction the center of the arc is pointing towards in degrees.
-    :param width: The number of degrees the ring covers.  Default is 360, which gives a full circle.  To only create a 1/4 arc, set this to 90.  Note that start and end position will be included.
-    :param steps: A pattern that describes which segment to emit.  *On* is
-        represented by ``#``, all other characters are considered *off*.
-    :param randomize: If ``randomize`` is set, ``steps`` is ignored and coordinates are chosen randomly from the ring.
-    :param rng: Alternative random function
-
-    The rng is assumed to have the following prototype::
-
-        def rng() -> float  # in the range 0 - 1
-
-    """
-
-    def __init__(self,
-                 radius: float,
-                 segments: int,
-                 aim: float = 0,
-                 width: float = 360,
-                 randomize: bool = False,
-                 steps: str = '#',
-                 jitter: float = 0) -> Iterator[Emit]:
-        self.radius = radius
-        self.segments = segments
-        self.aim = aim
-        self.width = width
-        self.randomize = randomize
-        self.steps = cycle(steps)
-        self.jitter = jitter
-
-        self.arc = _arc_cycle(self.width, self.segments)
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        """Return the next position and momentum"""
-
-        if self.randomize:
-            phi = random() * self.width - self.width / 2
-        else:
-            phi = next(self.arc)
-            if next(self.steps) != '#':
-                return None
-
-        angle = phi + self.aim
-
-        if self.jitter:
-            jitter = random() * self.jitter - self.jitter / 2
-            angle += jitter
-        rad = glm.radians(angle)
-        v = glm.rotate(vec2(1, 0), rad)
-
-        return v * self.radius, v

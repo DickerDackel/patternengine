@@ -1,12 +1,12 @@
-patternengine - The teeniest, tiniest python ECS
-================================================
+patternengine - Bullet Hell Patterns for Shmups
+===============================================
 
 .. toctree::
    :caption: Contents:
 
    introduction
-   helpers
    api
+   helpers
    glossary
    license
 
