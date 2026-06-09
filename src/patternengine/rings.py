@@ -1,7 +1,7 @@
 from collections.abc import Iterator, Sequence
 from itertools import chain, cycle
 from random import random
-from typing import Callable, Protocol
+from typing import Callable
 
 import glm
 
@@ -9,12 +9,10 @@ from glm import vec2
 
 
 type Emit = tuple[vec2, vec2]
+type EmitSource = Iterator[Emit]
 type Vector = glm.vec2 | Sequence[float, float]
 
 
-class EmitSource(Protocol):
-    def __init__(*args, **kwargs) -> Iterator[Emit]:
-        ...
 class Ring:
     """A generator for emit coordinates.
 
@@ -100,7 +98,7 @@ class Disk:
 
     def __init__(self,
                  radius: float = 1,
-                 rng: Callable[[float], vec2] = glm.diskRand) -> Iterator[Emit]:
+                 rng: Callable[[float], vec2] = glm.diskRand) -> None:
         self.radius = radius
         self.rng = rng
 
@@ -149,7 +147,7 @@ class Line:
                  randomize: bool = False,
                  rng: Callable = random,
                  emit_angle: float = 90,
-                 repeat: int = 0) -> Iterator[Emit]:
+                 repeat: int = 0) -> None:
         self.angle = angle
         self.length = length
         self.anchor = anchor
@@ -195,7 +193,7 @@ class Point:
        get values out of it using ``next(ring)``.
     """
 
-    def __init__(self, angle: float | None = None):
+    def __init__(self, angle: float | None = None) -> None:
         self.angle = angle
 
     def __next__(self) -> Emit:
@@ -226,7 +224,7 @@ class Rectangle:
     def __init__(self,
                  width: float,
                  height: float,
-                 rng: Callable = random) -> Iterator[Emit]:
+                 rng: Callable = random) -> None:
         self.width = width
         self.height = height
         self.rng = rng
