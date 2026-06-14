@@ -35,7 +35,7 @@ def test_ring_arc_aim():
 
 
 def test_ring_heartbeat():
-    r = pe.Ring(100, 3, aim=90, width=180, heartbeat='#.#')
+    r = pe.Ring(100, 3, aim=90, width=180, steps='#.#')
     assert approx(glm.degrees(glm.atan2(*next(r)[0].yx)), abs=0.001) == 0
     assert next(r) is None
     assert approx(glm.degrees(glm.atan2(*next(r)[0].yx)), abs=0.001) == -180
