@@ -7,8 +7,8 @@ patternengine - Bullet Hell Patterns for Shmups
    introduction
    overview
    api
-   helpers
-   helpers-api
+   demo-helpers
+   demo-helpers-api
    glossary
    license
 

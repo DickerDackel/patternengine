@@ -1,5 +1,5 @@
-Helpers
-=======
+Helpers and the Pattern Demos
+=============================
 
 .. danger:: This part of the library is highly experimental and prone to be
    replaced with something completely different.  Also the documentation is
@@ -9,7 +9,16 @@ With the basic concepts covered in :doc:`introduction`, there are a lot of
 patterns in bullet hell games, that can't be created just from the result of a
 ``BulletSource`` alone.
 
-Here are some helpers that can assist in creating more complex patterns.
+.. important:: All the all the bullet pattern demos have been made with the
+   help of these data structures and the functions that work on them, but
+   personally I don't use this part of the library anymore, since I'm working
+   with ECS instead.
+
+   So have a look at `pe-demo 01` - `pe-demo 06` and the source code, and use
+   this at your own risk.
+
+   They are no longer an official part of *patternengine*, consider them
+   application code of the demos.
 
 The POMS
 --------
@@ -36,6 +45,16 @@ spin
    The speed with wich a bullet or emitter rotates
 
 This is the corner data structure for all dynamics in the helper functions and
-classes.
+classes.  It comes with :term:`Mutator`s that manipulate it.
+
+The Mutator Stack
+-----------------
+
+Mutators are small functions that modify other objects.  E.g. a function that
+modifies the speed of an entity.
+
+The :class:`MutatorStack` is the container for these functions, and it comes
+with a ``run`` method to apply them.
+
 
 .. attention:: FIXME To be continued...

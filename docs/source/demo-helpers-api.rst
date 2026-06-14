@@ -1,9 +1,15 @@
 helpers API
 =================
 
+Alternative Bullet Sources
+--------------------------
+
 .. autoclass:: patternengine.Stack
 .. autoclass:: patternengine.Fan
 .. autoclass:: patternengine.Factory
+
+Mutators
+--------
 
 .. autoclass:: patternengine.poms.MutatorStack
 .. autoclass:: patternengine.poms.Mutator
