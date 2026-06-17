@@ -25,7 +25,7 @@ class Heartbeat:
 
     """
 
-    def __init__(self, duration: float, pattern: str) -> Generator[bool]:
+    def __init__(self, duration: float, pattern: str = '#') -> Generator[bool]:
         self.cooldown = Cooldown(duration / len(pattern), cold=True)
         self.c = cycle(pattern)
 
