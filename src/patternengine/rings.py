@@ -132,7 +132,7 @@ class Line:
     :param randomize: Return random positions on the emit line istead of fixed steps
     :param rng: Alternative random function
     :param emit_angle: The direction of the momentum
-    :param repeat: 0: cycle, 1: bounce back & forth
+    :param bounce: 0: cycle, 1: bounce back & forth
 
     The rng is assumed to have the following prototype::
 
@@ -150,7 +150,7 @@ class Line:
                  randomize: bool = False,
                  rng: Callable = random,
                  emit_angle: float = 90,
-                 repeat: int = 0) -> None:
+                 bounce: int = 0) -> None:
         self.angle = angle
         self.length = length
         self.anchor = anchor
@@ -159,9 +159,9 @@ class Line:
         self.emit_angle = emit_angle
 
         line_steps = _segmentalize_range(self.length, steps)
-        if repeat == 0:
+        if bounce == 0:
             self.cycle = cycle(line_steps)
-        elif repeat == 1:
+        elif bounce == 1:
             self.cycle = cycle(chain(line_steps, line_steps[-2:0:-1]))
 
     def __iter__(self) -> Iterator[Emit]:
