@@ -80,10 +80,11 @@ class Disk:
 
     :param radius: The radius of the emit disk
     :param rng: Alternative random function
+    :param aim: An optional aim direction, otherwise random
 
     The position will be a random point within the defined disk.  The
     momentum will be a normalized vector from the origin ``(0, 0)`` towards
-    that position.
+    that position, unless an aim angle is given.
 
     The rng is assumed to have the following prototype::
 
@@ -98,9 +99,11 @@ class Disk:
 
     def __init__(self,
                  radius: float = 1,
-                 rng: Callable[[float], vec2] = glm.diskRand) -> None:
+                 rng: Callable[[float], vec2] = glm.diskRand,
+                 aim: float | None = None) -> None:
         self.radius = radius
         self.rng = rng
+        self.aim = aim
 
     def __iter__(self) -> Iterator[Emit]:
         return self
@@ -109,7 +112,12 @@ class Disk:
         """Return the next position and momentum"""
 
         pos = self.rng(self.radius)
-        momentum = glm.normalize(pos)
+
+        if self.aim is None:
+            momentum = glm.normalize(pos)
+        else:
+            rad = glm.radians(self.aim)
+            momentum = glm.rotate(vec2(1, 0), rad)
 
         return pos, momentum
 
