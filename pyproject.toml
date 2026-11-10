@@ -17,10 +17,10 @@ classifiers = [
 ]
 
 dependencies = [
-    "pygame-ce",
     "pgcooldown",
+    "pygame-ce",
+    "pyglm",
     "rpeasings",
-    "pyglm"
 ]
 
 [project.scripts]

@@ -3,4 +3,3 @@ setuptools
 sphinx
 furo
 sphinx-autobuild
-patternengine
