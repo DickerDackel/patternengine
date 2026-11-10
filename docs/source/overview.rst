@@ -103,6 +103,7 @@ A basic gun that fires into a static direction would be created from a
 
 By segmenting the ring e.g. into 4 parts, the ring will forever cycle through
 the positions 0, 90, 180, 270 degrees.
+
    ring = Ring(50, 4)
 
 To make things more interesting, the active steps of the ring can be configured.
