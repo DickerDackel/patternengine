@@ -10,6 +10,7 @@ patternengine - Bullet Hell Patterns for Shmups
    demo-helpers
    demo-helpers-api
    glossary
+   ai-policy
    license
 
 Index

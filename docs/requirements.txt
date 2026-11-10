@@ -1,7 +1,6 @@
 build
 setuptools
 sphinx
-sphinx-autobuild
-myst-parser
 furo
-git+https://github.com/dickerdackel/patternengine
+sphinx-autobuild
+patternengine

@@ -1,3 +1,17 @@
+# v0.0.9
+
+Lots of structural changes, we're in double-zero versions still.
+This package has added sphinx docs.
+The existing sprite and dynamics objects that are not directly tied to the
+patternengine itself will move into different helper packages to have this
+library completely backend independent.
+
+In the near future, the best setup for patternengine will be
+
+- pygame-ce
+- tinyecs
+- tinyecs-compsys-patternengine
+
 # v0.0.6
 - Tutorial
 - More mutators, __all__

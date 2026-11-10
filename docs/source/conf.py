@@ -6,10 +6,16 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import sys
+
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
+
 project = 'patternengine'
 copyright = '2026, Michael "Dicker Dackel" Lamertz'
 author = 'Michael "Dicker Dackel" Lamertz'
-release = '0.0.7'
+release = '0.0.9'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -19,8 +25,6 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
-    'sphinx.ext.napoleon',
-    'myst_parser',
 ]
 
 templates_path = ['_templates']
@@ -33,7 +37,8 @@ html_theme = 'furo'
 html_static_path = ['_static']
 html_theme_options = {
     "navigation_with_keys": True,
-    "source_repository": "https://github.com/dickerdackel/patternengine",
+    "source_view_link": "https://forgejo.indieandmore.photography/dickerdackel/patternengine/src/branch/main/src/{filename}",
+    "source_edit_link": "https://forgejo.indieandmore.photography/dickerdackel/patternengine/_edit/main/src/{filename}",
     "source_branch": "main",
     "source_directory": "docs/source",
     "dark_css_variables": {
@@ -41,7 +46,5 @@ html_theme_options = {
         "color-api-name": "orange",
     }
 }
-
-autodoc_typehints = 'description'
 
 nitpicky = False
