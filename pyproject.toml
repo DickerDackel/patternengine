@@ -1,6 +1,6 @@
 [project]
 name = "patternengine"
-description = "patternengine"
+description = "A bullet hell pattern engine for games"
 version = "0.0.9"
 readme = "README.md"
 
